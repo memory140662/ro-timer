@@ -1,0 +1,37 @@
+state: 
+   - build
+   - deploy
+
+cache:
+   paths:
+      - "build"
+
+build:
+   state: build
+   image: node:latest
+   script: 
+      - npm install
+      - npm run build
+   only:
+      refs: 
+         - master
+      changes: 
+         - "src/**"
+   
+deploy:
+   state: deploy
+   image: andreysenov/firebase-tools
+   script:
+      - firebase deploy --token $FIREBASE_TOKEN
+   only:
+      refs: 
+         - master
+      changes: 
+         - "src/**"
+
+clean:
+   state: clean
+   script:
+      - rm -rf build
+   when: on_success
+      
