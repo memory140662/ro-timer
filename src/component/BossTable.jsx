@@ -1,6 +1,7 @@
 import React, {
     useState,
-    useEffect
+    useEffect,
+    useRef,
 } from 'react'
 import { connect } from 'react-redux'
 
@@ -121,6 +122,8 @@ function BossTable(props) {
       onUpdateBoss,
       onSetBossRandomTime, 
     } = props
+    const tableRef = useRef()
+    const [tableHeight, setTableHeight] = useState(0)
     const [search, setSearch] = useState(null)
     const [isShowDialog, setShowDialog] = useState(false)
     const [randomData, setRandomData] = useState({
@@ -144,6 +147,13 @@ function BossTable(props) {
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data])
+
+    useEffect(() => {
+      if (!tableHeight && tableRef && tableRef.current) {
+        setTableHeight(window.outerHeight - tableRef.current.offsetTop - 170)
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tableRef])
 
     const onRandomClick = (key, num) => {
       setRandomData({key, num})
@@ -199,7 +209,7 @@ function BossTable(props) {
     }
 
     const column = text => <span style={styles.column}>{text}</span>
-
+    console.log(tableRef)
     return (
         <>
           <style>{` 
@@ -207,7 +217,7 @@ function BossTable(props) {
                 background: #f5f5f5;
               }
           `}</style>
-          <Input 
+          <Input
               value={search}
               placeholder={'查詢'}
               style={styles.search}
@@ -216,9 +226,10 @@ function BossTable(props) {
               trim
               onIconClick={() => setSearch(null)}
           />
-          <div style={styles.tableOutside}>
+          <div style={styles.tableOutside} ref={tableRef}>
             <DndProvider backend={HTML5Backend}>
               <Table
+                size={'middle'}
                 bordered
                 rowClassName={(_, idx) => (
                   idx % 2 === 0 ? null : 'rowColor1'
@@ -232,7 +243,7 @@ function BossTable(props) {
                 //   moveRow: moveRow,
                 // })}
                 pagination={false}
-                scroll={{ y: 350 }}
+                scroll={{ y: tableHeight }}
               >
                 <Table.Column title={'名稱'} dataIndex={'name'} key={'name'} width={100} render={column}/>
                 <Table.Column title={'死亡時間'} dataIndex={'dealTime'} key={'dealTime'} width={120} render={column}/>
