@@ -18,6 +18,8 @@ export const setRandomTime = createAction(types.TYPE_SET_RANDOM_TIME)
 export const checkLocal = createAction(types.TYPE_CHECK_LOCAL)
 export const deleteLocalData = createAction(types.TYPE_DELETE_LOCAL_DATA)
 export const setAuthChanging = createAction(types.TYPE_SET_AUTH_CHANGING)
+export const createDialogVisible = createAction(types.TYPE_CREATE_DIALOG_VISIBLE)
+export const createDialogInvisible = createAction(types.TYPE_CREATE_DIALOG_INVISIBLE)
 
 // async
 export const deleteBoss = createAction(types.TYPE_DELETE_BOSS, Api.deleteBoss)

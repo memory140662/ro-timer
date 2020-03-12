@@ -34,6 +34,7 @@ import {
   editConfirm,
   setRandomTime,
   checkLocal,
+  createDialogVisible,
 } from '../common/actions'
 import RandomDialog from './RandomDialog'
 import EditBossDialog from './EditBossDialog'
@@ -47,10 +48,17 @@ const styles = {
     margin: 10
   },
   tableOutside: {
-    margin: 5,
+    margin: 10,
   },
   column: {
     color: '#000',
+  },
+  createButton: {
+    float: 'right', 
+    margin: '10px'
+  },
+  randomButton: {
+    width: '50px',
   }
 }
 
@@ -115,6 +123,7 @@ function BossTable(props) {
       onDelete,
       onSetRandomTime,
       onCheckLocal,
+      onCreateDialogVisible,
 
       onDeleteBoss, 
       onKillBoss, 
@@ -209,7 +218,7 @@ function BossTable(props) {
     }
 
     const column = text => <span style={styles.column}>{text}</span>
-    console.log(tableRef)
+
     return (
         <>
           <style>{` 
@@ -217,15 +226,22 @@ function BossTable(props) {
                 background: #f5f5f5;
               }
           `}</style>
-          <Input
-              value={search}
-              placeholder={'查詢'}
-              style={styles.search}
-              onChange={e => setSearch(e)}
-              icon={'close'}
-              trim
-              onIconClick={() => setSearch(null)}
-          />
+          <div style={styles.table}>
+            <Input
+                value={search}
+                placeholder={'查詢'}
+                style={styles.search}
+                onChange={e => setSearch(e)}
+                icon={'close'}
+                trim
+                onIconClick={() => setSearch(null)}
+            />
+            <Button 
+              size={'large'}
+              icon={'plus'} 
+              onClick={onCreateDialogVisible}
+              style={styles.createButton}>新增</Button>
+          </div>
           <div style={styles.tableOutside} ref={tableRef}>
             <DndProvider backend={HTML5Backend}>
               <Table
@@ -235,7 +251,7 @@ function BossTable(props) {
                   idx % 2 === 0 ? null : 'rowColor1'
                 )}
                 loading={isLoading}
-                style={styles.table}
+                style={{...styles.table}}
                 dataSource={data.filter(d => d.name && (!search || d.name.indexOf(search) !== -1))}
                 // components={components}
                 // onRow={(_, index) => ({
@@ -246,13 +262,13 @@ function BossTable(props) {
                 scroll={{ y: tableHeight }}
               >
                 <Table.Column title={'名稱'} dataIndex={'name'} key={'name'} width={100} render={column}/>
-                <Table.Column title={'死亡時間'} dataIndex={'dealTime'} key={'dealTime'} width={120} render={column}/>
-                <Table.Column title={'重生時間'} dataIndex={'nextTime'} key={'nextTime'} width={120} render={column}/>
+                <Table.Column align={'center'} title={'死亡時間'} dataIndex={'dealTime'} key={'dealTime'} width={120} render={column}/>
+                <Table.Column align={'center'} title={'重生時間'} dataIndex={'nextTime'} key={'nextTime'} width={120} render={column}/>
                 <Table.Column title={'冷卻時間(分鐘)'} dataIndex={'cd'} key={'cd'} width={150} render={column}/>
                 <Table.Column dataIndex={'randomTime'} key={'randomTime'} width={65} render={(_, data) => (
                   <Button 
                     onClick={() => onRandomClick(data.key, data.randomTime)} 
-                    size={'small'}
+                    style={styles.randomButton}
                   >{data.randomTime || 0}</Button>
                 )}/>
                 <Table.Column title={'操作'} dataIndex={'opt'} key={'opt'} width={320} render={(_, data) => (
@@ -297,6 +313,7 @@ BossTable.propTypes = {
     onDelete: PropTypes.func.isRequired,
     onSetRandomTime: PropTypes.func.isRequired,
     onCheckLocal: PropTypes.func.isRequired,
+    onCreateDialogVisible: PropTypes.func.isRequired,
     
     onDeleteBoss: PropTypes.func.isRequired,
     onKillBoss: PropTypes.func.isRequired,
@@ -323,6 +340,7 @@ const mapDispatch2Props = dispatch => ({
     onDelete: key => dispatch(deleteLocal(key)),
     onSetRandomTime: data => dispatch(setRandomTime(data)),
     onCheckLocal: data => dispatch(checkLocal(data)),
+    onCreateDialogVisible: () => dispatch(createDialogVisible()),
     
     onDeleteBoss: (userId, bossKey)=> dispatch(startLoading()) | dispatch(deleteBoss(userId, bossKey)),
     onKillBoss: (userId, bossKey) => dispatch(startLoading()) | dispatch(killBoss(userId, bossKey)),

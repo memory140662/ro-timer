@@ -21,6 +21,8 @@ build:
 deploy:
    state: deploy
    image: andreysenov/firebase-tools
+   variables:
+      REACT_APP_VERSION: $CI_COMMIT_TAG
    script:
       - firebase deploy --token $FIREBASE_TOKEN
    only:

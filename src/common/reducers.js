@@ -19,7 +19,8 @@ const initState = {
     user: null,
     isLoading: false,
     localData: null,
-    isAuthChanging: false
+    isAuthChanging: false,
+    isCreateDialogVisible: false,
 }
 
 const createHandler = (state, payload) => {
@@ -184,6 +185,12 @@ const setAuthChangingHandler = (state, payload) => {
     })
 }
 
+const createDialogVisibleHandler = (state, payload) => {
+    return update(state, {
+        isCreateDialogVisible: { $set: payload },
+    })
+}
+
 export default handleActions({
     [types.TYPE_CREATE]: (state, { payload }) => createHandler(state, payload),
     [types.TYPE_LOAD_DATA]: (state) => loadHandler(state),
@@ -208,4 +215,6 @@ export default handleActions({
     [types.TYPE_UPLOAD_LOCAL_TO_CLOUD]: (state, { payload }) => upload2CloudHandler(state, payload),
     [types.TYPE_DELETE_LOCAL_DATA]: (state) => deleteLocalDataHandler(state),
     [types.TYPE_SET_AUTH_CHANGING]: (state, { payload }) => setAuthChangingHandler(state, payload),
+    [types.TYPE_CREATE_DIALOG_VISIBLE]: (state) => createDialogVisibleHandler(state, true),
+    [types.TYPE_CREATE_DIALOG_INVISIBLE]: (state) => createDialogVisibleHandler(state, false),
 }, initState)

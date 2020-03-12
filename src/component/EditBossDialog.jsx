@@ -16,6 +16,12 @@ const styles = {
     time: {
       margin: 5,
     },
+    input: {
+        width: '200px',
+    },
+    dialog: {
+        width: '450px',
+    }
 }
 
 function EditBossDialog(props) {
@@ -42,6 +48,7 @@ function EditBossDialog(props) {
 
     return (
         <Dialog
+            style={styles.dialog}
             title={boss && boss.name}
             visible={ !!boss }
             onCancel={onCancel}
@@ -50,7 +57,7 @@ function EditBossDialog(props) {
                 <Dialog.Body>
                     <Form.Item label={'死亡時間'} style={styles.time} labelWidth={'120'}>
                         <TimePicker
-                            size={'large'}
+                            style={styles.input}
                             onChange={e => setDealTime(e)}
                             value={dealTime}
                             format={TIME_FORMAT}
@@ -60,6 +67,7 @@ function EditBossDialog(props) {
                     <Form.Item label={'冷卻時間(分鐘)'} style={styles.time} labelWidth={'120'}>
                         <div className='el-input-number'>
                             <input
+                                style={styles.input}
                                 ref={editCdRef}
                                 className='form-control' 
                                 type={'number'}
