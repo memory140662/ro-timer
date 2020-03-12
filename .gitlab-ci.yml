@@ -1,4 +1,4 @@
-state: 
+stages: 
    - build
    - deploy
 
@@ -6,7 +6,7 @@ cache:
    paths:
       - "build"
 
-build:
+job build:
    state: build
    image: node:latest
    script: 
@@ -18,7 +18,7 @@ build:
       changes: 
          - "src/**"
    
-deploy:
+job deploy:
    state: deploy
    image: andreysenov/firebase-tools
    variables:
@@ -31,7 +31,7 @@ deploy:
       changes: 
          - "src/**"
 
-clean:
+job clean:
    state: clean
    script:
       - rm -rf build
