@@ -1,0 +1,6 @@
+export const COOKIE_NAME_BOSS_TIME = 'COOKIE_NAME_BOSS_TIME'
+export const TIME_FORMAT = 'HH:mm'
+export const TIME_NUM_FORMAT = 'HHmm'
+export const TIME_NUM_FORMAT2 = 'Hmm'
+export const TIME_NUM_FORMAT3 = 'HH'
+export const TIME_NUM_FORMAT4 = 'H'
