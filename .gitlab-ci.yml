@@ -15,8 +15,7 @@ job build:
       - npm install
       - npm run build
    only:
-      refs: 
-         - master
+      - tags
    
 job deploy:
    stage: deploy
@@ -26,15 +25,13 @@ job deploy:
    script:
       - firebase deploy --token "$FIREBASE_TOKEN"
    only:
-      refs: 
-         - master
+      - tags
 
 job clean:
    stage: clean
    script:
       - rm -rf build
    only:
-      refs: 
-         - master
+      - tags
    when: on_success
       
