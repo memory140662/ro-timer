@@ -6,6 +6,7 @@ stages:
 cache:
    paths:
       - "build"
+      - "node_modules"
 
 job build:
    stage: build
@@ -36,5 +37,8 @@ job clean:
    stage: clean
    script:
       - rm -rf build
+   only:
+      refs: 
+         - master
    when: on_success
       
