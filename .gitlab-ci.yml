@@ -24,7 +24,6 @@ job deploy:
    variables:
       REACT_APP_VERSION: $CI_COMMIT_TAG
    script:
-      - firebase login:ci --token "$FIREBASE_LOGIN_TOKEN"
       - firebase deploy --token "$FIREBASE_TOKEN"
    only:
       refs: 
