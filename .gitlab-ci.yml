@@ -17,8 +17,6 @@ job build:
    only:
       refs: 
          - master
-      changes: 
-         - "src/**"
    
 job deploy:
    stage: deploy
@@ -30,8 +28,6 @@ job deploy:
    only:
       refs: 
          - master
-      changes: 
-         - "src/**"
 
 job clean:
    stage: clean
