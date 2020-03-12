@@ -10,12 +10,12 @@ cache:
 
 job build:
    stage: build
-   image: node:latest
+   image: yarnpkg/node-yarn:latest
    variables:
       REACT_APP_VERSION: $CI_COMMIT_TAG
    script: 
-      - npm install
-      - npm run build
+      - yarn
+      - yarn build
    only:
       - tags
    
