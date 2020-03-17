@@ -10,10 +10,13 @@ import {
     Button
 } from 'element-react/next'
 
+import { useLocation } from 'react-router-dom'
+
 import { Table } from 'antd'
 import { DndProvider, useDrag, useDrop } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 import update from 'immutability-helper'
+import { database } from '../common/api'
 
 import PropTypes from 'prop-types'
 
@@ -35,6 +38,9 @@ import {
   setRandomTime,
   checkLocal,
   createDialogVisible,
+  receiveBossChanged,
+  receiveBossAdded,
+  receiveBossRemove
 } from '../common/actions'
 
 import asyncComponent from '../hoc/asyncComponent'
@@ -62,6 +68,11 @@ const styles = {
   },
   randomButton: {
     width: '50px',
+    color: '#000'
+  },
+  randomButtonDisable: {
+    width: '50px',
+    color: '#000'
   }
 }
 
@@ -109,6 +120,8 @@ const components = {
   },
 }
 
+const useQuery = () => (new URLSearchParams(useLocation().search))
+
 function BossTable(props) {
     const { 
       data,
@@ -127,6 +140,9 @@ function BossTable(props) {
       onSetRandomTime,
       onCheckLocal,
       onCreateDialogVisible,
+      onReceiveBossChanged,
+      onReceiveBossAdded,
+      onReceiveBossRemoved,
 
       onDeleteBoss, 
       onKillBoss, 
@@ -143,18 +159,60 @@ function BossTable(props) {
       num: 0,
     })
 
+    const query = useQuery()
+    const id = query.get('id')
+
     useEffect(() => {
-      if (user) {
-        onCheckLocal()
-        onGetAllBoss(user.uid)
+      let bossChangedRef = null
+      let bossAddedRef = null
+      let bossRemovedRef = null
+      if (id) {
+        onGetAllBoss(id)
+        if (!bossChangedRef) {
+          bossChangedRef = database.ref(`/users/${id}/bosses`)
+          bossChangedRef.on('child_changed', snapshot => {
+            const val = snapshot.val()
+            onReceiveBossChanged(val)
+          })
+        }
+        if (!bossAddedRef) {
+          bossAddedRef = database.ref(`/users/${id}/bosses`)
+          bossAddedRef.on('child_added', snapshot => {
+            const val = snapshot.val()
+            onReceiveBossAdded(val)
+          })
+        }
+        if (!bossRemovedRef) {
+          bossRemovedRef = database.ref(`/users/${id}/bosses`)
+          bossRemovedRef.on('child_removed', snapshot => {
+            const val = snapshot.val()
+            onReceiveBossRemoved(val)
+          })
+        }
       } else {
-        onLoad()
+        if (user) {
+          onCheckLocal()
+          onGetAllBoss(user.uid)
+        } else {
+          onLoad()
+        }
+      }
+      return () => {
+        if (bossChangedRef) {
+          bossChangedRef.off('child_changed')
+        }
+        if (bossAddedRef) {
+          bossAddedRef.off('child_added')
+        }
+        if (bossRemovedRef) {
+          bossRemovedRef.off('child_removed')
+        }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user])
+    }, [user, id])
     
     useEffect(() => {
-      if (!user && data && data.length > 0) {
+      if (!id && !user && data && data.length > 0) {
         onSave()
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -222,6 +280,8 @@ function BossTable(props) {
 
     const column = text => <span style={styles.column}>{text}</span>
 
+    const isEditable = !id || (user && user.uid === id)
+
     return (
         <>
           <style>{` 
@@ -239,11 +299,11 @@ function BossTable(props) {
                 trim
                 onIconClick={() => setSearch(null)}
             />
-            <Button 
+            {isEditable ? <Button 
               size={'large'}
               icon={'plus'} 
               onClick={onCreateDialogVisible}
-              style={styles.createButton}>新增</Button>
+              style={styles.createButton}>新增</Button> : null}
           </div>
           <div style={styles.tableOutside} ref={tableRef}>
             <DndProvider backend={HTML5Backend}>
@@ -270,16 +330,20 @@ function BossTable(props) {
                 <Table.Column title={'冷卻時間(分鐘)'} dataIndex={'cd'} key={'cd'} width={150} render={column}/>
                 <Table.Column dataIndex={'randomTime'} key={'randomTime'} width={65} render={(_, data) => (
                   <Button 
+                    disabled={!isEditable}
+                    type={isEditable ? null : 'text'}
                     onClick={() => onRandomClick(data.key, data.randomTime)} 
-                    style={styles.randomButton}
+                    style={isEditable ? styles.randomButton : styles.randomButtonDisable}
                   >{data.randomTime || 0}</Button>
                 )}/>
                 <Table.Column title={'操作'} dataIndex={'opt'} key={'opt'} width={320} render={(_, data) => (
+                  isEditable ? 
                   <>
                     <Button icon={'check'} type={'success'} onClick={() => killHandler(user && user.uid, data.key)}>擊殺</Button>
                     <Button icon={'edit'} type={'info'} onClick={() => onEdit(data.key)}>編輯</Button>
                     <Button icon={'delete'} type={'danger'} onClick={() => deleteHandler(user && user.uid, data.key)}>刪除</Button>
                   </>
+                  : null
                 )}/>
               </Table>
             </DndProvider>
@@ -317,6 +381,7 @@ BossTable.propTypes = {
     onSetRandomTime: PropTypes.func.isRequired,
     onCheckLocal: PropTypes.func.isRequired,
     onCreateDialogVisible: PropTypes.func.isRequired,
+    onReceiveBossChanged: PropTypes.func.isRequired,
     
     onDeleteBoss: PropTypes.func.isRequired,
     onKillBoss: PropTypes.func.isRequired,
@@ -344,6 +409,9 @@ const mapDispatch2Props = dispatch => ({
     onSetRandomTime: data => dispatch(setRandomTime(data)),
     onCheckLocal: data => dispatch(checkLocal(data)),
     onCreateDialogVisible: () => dispatch(createDialogVisible()),
+    onReceiveBossChanged: boss => dispatch(receiveBossChanged(boss)),
+    onReceiveBossAdded: boss => dispatch(receiveBossAdded(boss)),
+    onReceiveBossRemoved: boss => dispatch(receiveBossRemove(boss)),
     
     onDeleteBoss: (userId, bossKey)=> dispatch(startLoading()) | dispatch(deleteBoss(userId, bossKey)),
     onKillBoss: (userId, bossKey) => dispatch(startLoading()) | dispatch(killBoss(userId, bossKey)),

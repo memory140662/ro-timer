@@ -1,7 +1,13 @@
 import React, { useEffect } from 'react'
-import { Button, Layout, Spin } from 'antd'
+import { Button, Layout, Spin, Avatar, Popover } from 'antd'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import GoogleSvg from '../resource/img/google.svg'
+import LogoutSvg from '../resource/img/logout.svg'
+import ShareSvg from '../resource/img/share.svg'
+import UserSvg from '../resource/img/user.svg'
+import { useHistory } from 'react-router-dom'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 import { signInUser, setUser, signOutUser, setAuthChanging } from '../common/actions'
 import { auth } from '../common/api'
@@ -16,8 +22,39 @@ const styles = {
         fontSize: '18px',
     },
     login: {
+        width: '50px',
         float: 'right',
-        height: '31px',
+        height: '65px',
+    },
+    share: {
+        width: '50px',
+        float: 'right',
+        height: '65px',
+    },
+    avatar: {
+        width: '50px',
+        float: 'right',
+        height: '65px',
+        marginTop: '-2px',
+    },
+    avatarPhoto: {
+        cursor: 'pointer',
+    },
+    userImg: {
+        height: '30px',
+        width: '30px',
+        marginTop: '3px',
+        marginLeft: '5px',
+    },
+    shareImg: {
+        height: '24px',
+        width: '24px',
+        marginLeft: '-3px',
+        marginTop: '-3px',
+    },
+    img: {
+        height: '24px',
+        width: '24px',
     }
 }
 
@@ -35,32 +72,74 @@ const MainHeader = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    const history = useHistory()
+
     const renderLoginButton = (user, isAuthChanging) => {
         if (isAuthChanging) {
-            return <Spin />
+            return <Spin size={'large'} />
         }
 
         if (user) {
-            return <Button shape='round' block onClick={onSignOutUser}>{user.displayName} Sign out</Button>
+            return <Button size={'large'} shape={'circle'} icon={<img alt={''} src={LogoutSvg} width={styles.img.width} height={styles.img.height}/>} onClick={onSignOutUser} ></Button>
         } else if (user === null) {
-            return <Button shape='round' danger onClick={onSignInUser}>Sign in with Google</Button>
+            return <Button size={'large'} ghost shape={'circle'} icon={<img alt={''} src={GoogleSvg} width={styles.img.width} height={styles.img.height}/>} onClick={onSignInUser}></Button>
         }
+    }
+    const getShareText= userId => {
+        let link = window.location.protocol
+        link += `//${window.location.hostname}`
+        if (window.location.port) {
+            link += `:${window.location.port}`
+        }
+        link += `?id=${userId}`
+        return link
+    }
+
+    
+
+    const renderShareButton = ({ disabled, text }) => {
+        const content = (
+            <div>
+                鏈接複製成功！
+            </div>
+        )
+
+        let btn = <Button disabled={disabled} size={'large'} shape='circle' icon={<img alt={''} src={ShareSvg} style={styles.shareImg}/>}></Button>
+
+        if (disabled) {
+            return btn
+        }
+
+        return (
+            <CopyToClipboard text={text}>
+                <Popover trigger={'click'} content={content}>
+                    {btn}
+                </Popover>
+            </CopyToClipboard>
+        )
     }
 
     return (
         <>
-            <style>{`
-                .login {
-                    float: right;
-                    height: 31px;
-                }
-            `}</style>
             <Header>
                 <div style={styles.version} >
                     {process.env.REACT_APP_VERSION} 
                 </div>
                 <div style={styles.login}>
                     {renderLoginButton(user, isAuthChanging)}
+                </div>
+                <div style={styles.share}>
+                    {renderShareButton({ disabled: !user, text: (user ? getShareText(user.uid) : null) })}
+                </div>
+                <div style={styles.avatar}>
+                    <Avatar 
+                        onClick={() => user && history.push('/')}
+                        style={user ? styles.avatarPhoto : null}
+                        icon={<img alt={''} src={UserSvg} style={styles.userImg}/>}
+                        size={'large'}
+                        alt={user ? user.displayName : null} 
+                        src={user ? user.photoURL : null}
+                    />    
                 </div>
             </Header>
         </>

@@ -16,3 +16,9 @@ export const getTimeNumFormat = (timeNumb) => {
 
     return TIME_NUM_FORMAT4
 }
+
+export const asyncPending = type => `${type}_PENDING`
+
+export const asyncFulfilled = type => `${type}_FULFILLED`
+
+export const asyncRejected = type => `${type}_REJECTED`

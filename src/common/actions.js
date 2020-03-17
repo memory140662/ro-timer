@@ -20,6 +20,9 @@ export const deleteLocalData = createAction(types.TYPE_DELETE_LOCAL_DATA)
 export const setAuthChanging = createAction(types.TYPE_SET_AUTH_CHANGING)
 export const createDialogVisible = createAction(types.TYPE_CREATE_DIALOG_VISIBLE)
 export const createDialogInvisible = createAction(types.TYPE_CREATE_DIALOG_INVISIBLE)
+export const receiveBossChanged = createAction(types.TYPE_RECEIVE_BOSS_CHANGED)
+export const receiveBossAdded = createAction(types.TYPE_RECEIVE_BOSS_ADDED)
+export const receiveBossRemove = createAction(types.TYPE_RECEIVE_BOSS_REMOVED)
 
 // async
 export const deleteBoss = createAction(types.TYPE_DELETE_BOSS, Api.deleteBoss)

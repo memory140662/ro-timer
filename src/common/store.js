@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware } from 'redux'
 import reducer from './reducers'
 import thunk from 'redux-thunk'
-import reduxPromise from 'redux-promise'
+import reduxPromise from 'redux-promise-middleware'
 
 const middlewareList = [
     thunk,

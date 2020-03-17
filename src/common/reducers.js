@@ -4,6 +4,7 @@ import cookie from 'react-cookies'
 import { handleActions } from 'redux-actions'
 import update from 'immutability-helper'
 import Service from './service'
+import { asyncFulfilled, asyncRejected, asyncPending } from './utils'
 
 import {
     COOKIE_NAME_BOSS_TIME,
@@ -21,6 +22,7 @@ const initState = {
     localData: null,
     isAuthChanging: false,
     isCreateDialogVisible: false,
+    error: null,
 }
 
 const createHandler = (state, payload) => {
@@ -37,6 +39,11 @@ const createHandler = (state, payload) => {
 }
 
 const createBossHandler = (state, payload) => {
+    if (state.data.findIndex(boss => boss.key === payload.key) !== -1) {
+        return update(state, { 
+            isLoading: { $set: false },
+        })
+    }
 
     return update(state, { 
         data: { $push: [ payload ] }, 
@@ -92,7 +99,13 @@ const sortDataHandler = (state, payload) => {
     return update(state, {data: {$set: payload}})
 }
 
-const getAllBossHandler = (state, payload) => {
+const getAllBossHandler = (state, payload, error) => {
+    if (error) {
+        return update(state, {
+            isLoading: {$set: false}
+        })
+    }
+
     return update(state, {
         data: {$set: payload},
         isLoading: {$set: false}
@@ -191,30 +204,98 @@ const createDialogVisibleHandler = (state, payload) => {
     })
 }
 
+const pendingHandler = (state) => {
+    return update(state, {
+        isLoading: { $set: true },
+        error: { $set: null },
+    })
+}
+
+const rejectedHandler = (state, payload) => {
+    return update(state, {
+        isLoading: { $set: false },
+        error: { $set: payload.message },
+    })
+}
+
+const receiveBossChangedHandler = (state, payload) => {
+    const index = state.data.findIndex(boss => boss.key === payload.key)
+    if (index === -1) {
+        return state
+    }
+
+    return update(state, {
+        data: { $splice: [[index, 1, payload]] }
+    })
+}
+
+const receiveBossAddedHandler = (state, payload) => {
+    if (state.data.findIndex(boss => boss.key === payload.key) !== -1) {
+        return state
+    }
+
+    return update(state, {
+        data: { $push: [ payload ] },
+    })
+}
+
+const receiveBossRemovedHandler = (state, payload) => {
+    const index = state.data.findIndex(boss => boss.key === payload.key)
+    if (index === -1) {
+        return state
+    }
+
+    return update(state, {
+        data: { $splice: [[index, 1]] }
+    })
+}
+
 export default handleActions({
     [types.TYPE_CREATE]: (state, { payload }) => createHandler(state, payload),
     [types.TYPE_LOAD_DATA]: (state) => loadHandler(state),
-    [types.TYPE_CREATE_BOSS]: (state, { payload }) => createBossHandler(state, payload),
     [types.TYPE_KILL]: (state, { payload }) => killHandler(state, payload),
-    [types.TYPE_KILL_BOSS]: (state, { payload }) => updateBossHandler(state, payload),
-    [types.TYPE_UPDATE_BOSS]: (state, { payload }) => updateBossHandler(state, payload),
-    [types.TYPE_SET_BOSS_RANDOM_TIME]: (state, { payload }) => updateBossHandler(state, payload),
     [types.TYPE_SET_RANDOM_TIME]: (state, { payload }) => setRandomTime(state, payload),
     [types.TYPE_EDIT]: (state, { payload }) => editHandler(state, payload),
     [types.TYPE_EDIT_CANCEL]: state => editCancelHandler(state),
     [types.TYPE_EDIT_CONFIRM]: (state, { payload }) => editConfirmHandler(state, payload),
     [types.TYPE_SAVE_DATA]: state => saveHandler(state),
-    [types.TYPE_DELETE_BOSS]: (state, { payload }) => deleteBossHandler(state, payload),
     [types.TYPE_DELETE]: (state, { payload }) => deleteBossHandler(state, payload),
     [types.TYPE_CREATE_EDIT]: (state, { payload }) => createEditHandler(state, payload),
     [types.TYPE_SORT_DATA]: (state, { payload }) => sortDataHandler(state, payload),
     [types.TYPE_SET_USER]: (state, { payload }) => setUserHandler(state, payload),
-    [types.TYPE_GET_ALL_BOSS]: (state, { payload }) => getAllBossHandler(state, payload),
     [types.TYPE_START_LOADING]: state => startLoadingHandler(state),
     [types.TYPE_CHECK_LOCAL]: state => checkLocalHandler(state),
-    [types.TYPE_UPLOAD_LOCAL_TO_CLOUD]: (state, { payload }) => upload2CloudHandler(state, payload),
     [types.TYPE_DELETE_LOCAL_DATA]: (state) => deleteLocalDataHandler(state),
     [types.TYPE_SET_AUTH_CHANGING]: (state, { payload }) => setAuthChangingHandler(state, payload),
     [types.TYPE_CREATE_DIALOG_VISIBLE]: (state) => createDialogVisibleHandler(state, true),
     [types.TYPE_CREATE_DIALOG_INVISIBLE]: (state) => createDialogVisibleHandler(state, false),
+    [types.TYPE_RECEIVE_BOSS_CHANGED]: (state, { payload }) => receiveBossChangedHandler(state, payload),
+    [types.TYPE_RECEIVE_BOSS_ADDED]: (state, { payload }) => receiveBossAddedHandler(state, payload),
+    [types.TYPE_RECEIVE_BOSS_REMOVED]: (state, { payload }) => receiveBossRemovedHandler(state, payload),
+    // pending
+    [asyncPending(types.TYPE_SIGN_IN_USER)]: (state) => pendingHandler(state),
+    [asyncPending(types.TYPE_SIGN_OUT_USER)]: (state) => pendingHandler(state),
+    [asyncPending(types.TYPE_GET_ALL_BOSS)]: (state) => pendingHandler(state),
+    [asyncPending(types.TYPE_CREATE_BOSS)]: (state) => pendingHandler(state),
+    [asyncPending(types.TYPE_KILL_BOSS)]: (state) => pendingHandler(state),
+    [asyncPending(types.TYPE_UPDATE_BOSS)]: (state) => pendingHandler(state),
+    [asyncPending(types.TYPE_SET_BOSS_RANDOM_TIME)]: (state) => pendingHandler(state),
+    [asyncPending(types.TYPE_UPLOAD_LOCAL_TO_CLOUD)]: (state) => pendingHandler(state),
+    [asyncPending(types.TYPE_DELETE_BOSS)]: (state) => pendingHandler(state),
+    // fulfilled
+    [asyncFulfilled(types.TYPE_GET_ALL_BOSS)]: (state, { payload }) => getAllBossHandler(state, payload),
+    [asyncFulfilled(types.TYPE_CREATE_BOSS)]: (state, { payload }) => createBossHandler(state, payload),
+    [asyncFulfilled(types.TYPE_KILL_BOSS)]: (state, { payload }) => updateBossHandler(state, payload),
+    [asyncFulfilled(types.TYPE_UPDATE_BOSS)]: (state, { payload }) => updateBossHandler(state, payload),
+    [asyncFulfilled(types.TYPE_SET_BOSS_RANDOM_TIME)]: (state, { payload }) => updateBossHandler(state, payload),
+    [asyncFulfilled(types.TYPE_UPLOAD_LOCAL_TO_CLOUD)]: (state, { payload }) => upload2CloudHandler(state, payload),
+    [asyncFulfilled(types.TYPE_DELETE_BOSS)]: (state, { payload }) => deleteBossHandler(state, payload),
+    // rejected
+    [asyncRejected(types.TYPE_GET_ALL_BOSS)]: (state, { payload }) => rejectedHandler(state, payload),
+    [asyncRejected(types.TYPE_CREATE_BOSS)]: (state, { payload }) => rejectedHandler(state, payload),
+    [asyncRejected(types.TYPE_KILL_BOSS)]: (state, { payload }) => rejectedHandler(state, payload),
+    [asyncRejected(types.TYPE_UPDATE_BOSS)]: (state, { payload }) => rejectedHandler(state, payload),
+    [asyncRejected(types.TYPE_SET_BOSS_RANDOM_TIME)]: (state, { payload }) => rejectedHandler(state, payload),
+    [asyncRejected(types.TYPE_UPLOAD_LOCAL_TO_CLOUD)]: (state, { payload }) => rejectedHandler(state, payload),
+    [asyncRejected(types.TYPE_DELETE_BOSS)]: (state, { payload }) => rejectedHandler(state, payload),
 }, initState)

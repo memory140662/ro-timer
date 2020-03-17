@@ -1,12 +1,19 @@
 import React from 'react'
 
 import asyncComponent from './hoc/asyncComponent'
+import errorNotification from './hoc/errorNotification'
 
 import BossTable from './component/BossTable'
 
 import {
   Layout,
 } from 'antd'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+} from 'react-router-dom'
+
 import MainHeader from './component/MainHeader'
 
 const CreateBossDialog = asyncComponent(import('./component/CreateBossDialog'))
@@ -21,15 +28,21 @@ const styles = {
 const { Content } = Layout
 function App() {
   return (
-    <Layout className='layout'>
-      <MainHeader />
-      <Content style={styles.content}>
-        <CreateBossDialog />
-        <BossTable />
-        <Local2CloudDialog />
-      </Content>
-    </Layout>
+    <Router>
+      <Switch>
+        <Route>
+          <Layout className='layout'>
+            <MainHeader />
+            <Content style={styles.content}>
+              <CreateBossDialog />
+              <BossTable />
+              <Local2CloudDialog />
+            </Content>
+          </Layout>
+          </Route>
+      </Switch>
+    </Router>
   )
 }
 
-export default App
+export default errorNotification(App)
