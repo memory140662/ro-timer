@@ -14,8 +14,8 @@ job build:
    variables:
       REACT_APP_VERSION: $CI_COMMIT_TAG
    script: 
-      - node install
-      - node run build
+      - npm install
+      - npm run build
    only:
       - master
       - tags
