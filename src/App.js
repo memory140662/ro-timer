@@ -1,12 +1,16 @@
 import React from 'react'
 
-import CreateBossDialog from './component/CreateBossDialog'
+import asyncComponent from './hoc/asyncComponent'
+
 import BossTable from './component/BossTable'
-import Local2CloudDialog from './component/Local2CloudDialog'
+
 import {
   Layout,
 } from 'antd'
 import MainHeader from './component/MainHeader'
+
+const CreateBossDialog = asyncComponent(import('./component/CreateBossDialog'))
+const Local2CloudDialog = asyncComponent(import('./component/Local2CloudDialog'))
 
 const styles = {
   content: {

@@ -36,8 +36,11 @@ import {
   checkLocal,
   createDialogVisible,
 } from '../common/actions'
-import RandomDialog from './RandomDialog'
-import EditBossDialog from './EditBossDialog'
+
+import asyncComponent from '../hoc/asyncComponent'
+
+const RandomDialog = asyncComponent(import('./RandomDialog'))
+const EditBossDialog = asyncComponent(import('./EditBossDialog'))
 
 const styles = {
   table: {
@@ -291,7 +294,7 @@ function BossTable(props) {
               boss={currentBoss}
               user={user}
               onCancel={onCancel}
-              updateBoss={editHandler}
+              onUpdateBoss={editHandler}
           /> 
         </>
     )
@@ -345,7 +348,7 @@ const mapDispatch2Props = dispatch => ({
     onDeleteBoss: (userId, bossKey)=> dispatch(startLoading()) | dispatch(deleteBoss(userId, bossKey)),
     onKillBoss: (userId, bossKey) => dispatch(startLoading()) | dispatch(killBoss(userId, bossKey)),
     onGetAllBoss: (userId) => dispatch(startLoading()) |  dispatch(getAllBoss(userId)),
-    onUpdateBoss: (userId, bossKey, data) => dispatch(updateBoss(userId, bossKey, data)),
+    onUpdateBoss: (userId, bossKey, data) => dispatch(startLoading()) | dispatch(updateBoss(userId, bossKey, data)),
     onSetBossRandomTime: (userId, bossKey, randomTime) => dispatch(startLoading()) |  dispatch(setBossRandomTime(userId, bossKey, randomTime)),
 })
 

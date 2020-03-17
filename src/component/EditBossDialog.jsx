@@ -25,7 +25,7 @@ const styles = {
 }
 
 function EditBossDialog(props) {
-    const { boss, onCancel, updateBoss, user } = props
+    const { boss, onCancel, onUpdateBoss, user } = props
 
     const editDealTimeRef = useRef()
     const editCdRef = useRef()
@@ -33,10 +33,11 @@ function EditBossDialog(props) {
 
     const submitHandler = e => {
         e.preventDefault()
-        updateBoss(user && user.uid, boss.key, {
+        onUpdateBoss(user && user.uid, boss.key, {
             cd: editCdRef.current.value.length ? +editCdRef.current.value : null,
             dealTime: dealTime && moment(dealTime).format(TIME_FORMAT),
         })
+        onCancel()
     }
 
     useEffect(() => {
@@ -91,7 +92,7 @@ EditBossDialog.propTypes = {
     boss: PropTypes.object,
     user: PropTypes.object,
     onCancel: PropTypes.func.isRequired,
-    updateBoss: PropTypes.func.isRequired,
+    onUpdateBoss: PropTypes.func.isRequired,
 }
 
 export default EditBossDialog
