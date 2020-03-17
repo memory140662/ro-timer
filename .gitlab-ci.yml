@@ -17,6 +17,7 @@ job build:
       - node install
       - node run build
    only:
+      - master
       - tags
    
 job deploy:
@@ -32,6 +33,7 @@ job clean:
    script:
       - rm -rf build
    only:
+      - master
       - tags
    when: on_success
       
