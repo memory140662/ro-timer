@@ -23,6 +23,8 @@ export const createDialogInvisible = createAction(types.TYPE_CREATE_DIALOG_INVIS
 export const receiveBossChanged = createAction(types.TYPE_RECEIVE_BOSS_CHANGED)
 export const receiveBossAdded = createAction(types.TYPE_RECEIVE_BOSS_ADDED)
 export const receiveBossRemove = createAction(types.TYPE_RECEIVE_BOSS_REMOVED)
+export const setRandomDialogVisible = createAction(types.TYPE_SET_RANDOM_DIALOG_VISIBLE)
+export const setRandomBoss = createAction(types.TYPE_SET_RANDOM_BOSS)
 
 // async
 export const deleteBoss = createAction(types.TYPE_DELETE_BOSS, Api.deleteBoss)
