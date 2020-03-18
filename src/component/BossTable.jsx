@@ -32,17 +32,13 @@ import {
   save,
   kill,
   deleteLocal,
-  setRandomTime,
   checkLocal,
   createDialogVisible,
   receiveBossChanged,
   receiveBossAdded,
-  receiveBossRemove
+  receiveBossRemove,
+  setRandomBoss
 } from '../common/actions'
-
-import asyncComponent from '../hoc/asyncComponent'
-
-const RandomDialog = asyncComponent(import('./RandomDialog'))
 
 const styles = {
   table: {
@@ -130,26 +126,20 @@ function BossTable(props) {
       onSave,
       onKill,
       onDelete,
-      onSetRandomTime,
       onCheckLocal,
       onCreateDialogVisible,
       onReceiveBossChanged,
       onReceiveBossAdded,
       onReceiveBossRemoved,
+      onOpenRandomDialog,
 
       onDeleteBoss, 
       onKillBoss, 
       onGetAllBoss,
-      onSetBossRandomTime, 
     } = props
     const tableRef = useRef()
     const [tableHeight, setTableHeight] = useState(0)
     const [search, setSearch] = useState(null)
-    const [isShowDialog, setShowDialog] = useState(false)
-    const [randomData, setRandomData] = useState({
-      key: null,
-      num: 0,
-    })
 
     const query = useQuery()
     const id = query.get('id')
@@ -217,15 +207,6 @@ function BossTable(props) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tableRef])
 
-    const onRandomClick = (key, num) => {
-      setRandomData({key, num})
-      setShowDialog(true)
-    }
-
-    const onChoiceCancel = () => {
-      setShowDialog(false)
-    }
-
     // eslint-disable-next-line
     const moveRow = (dragIndex, hoverIndex) => {
       const dragRow = data[dragIndex]
@@ -251,14 +232,6 @@ function BossTable(props) {
         onKillBoss(uid, bossKey)
       } else {
         onKill(bossKey)
-      }
-    }
-
-    const setRandomTimeHandler = (uid, bossKey, num) => {
-      if (uid) {
-        onSetBossRandomTime(uid, bossKey, num)
-      } else {
-        onSetRandomTime({num, key: bossKey})
       }
     }
 
@@ -316,7 +289,7 @@ function BossTable(props) {
                   <Button 
                     disabled={!isEditable}
                     type={isEditable ? null : 'text'}
-                    onClick={() => onRandomClick(data.key, data.randomTime)} 
+                    onClick={() => onOpenRandomDialog(data)} 
                     style={isEditable ? styles.randomButton : styles.randomButtonDisable}
                   >{data.randomTime || 0}</Button>
                 )}/>
@@ -332,12 +305,6 @@ function BossTable(props) {
               </Table>
             </DndProvider>
           </div>
-          <RandomDialog 
-            isShowDialog={isShowDialog} 
-            onCancel={onChoiceCancel}
-            onChoice={num => setRandomTimeHandler(user && user.uid, randomData.key, num)}
-            choiceNum={randomData.num}
-          />
         </>
     )
 }
@@ -353,15 +320,15 @@ BossTable.propTypes = {
     onSave: PropTypes.func.isRequired,
     onKill: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
-    onSetRandomTime: PropTypes.func.isRequired,
+    
     onCheckLocal: PropTypes.func.isRequired,
     onCreateDialogVisible: PropTypes.func.isRequired,
     onReceiveBossChanged: PropTypes.func.isRequired,
+    onOpenRandomDialog: PropTypes.func.isRequired,
     
     onDeleteBoss: PropTypes.func.isRequired,
     onKillBoss: PropTypes.func.isRequired,
     onGetAllBoss: PropTypes.func.isRequired,
-    onSetBossRandomTime: PropTypes.func.isRequired,
 }
 
 const mapState2Props = state => ({
@@ -378,17 +345,17 @@ const mapDispatch2Props = dispatch => ({
     onSave: () => dispatch(save()),
     onKill: key => dispatch(kill(key)),
     onDelete: key => dispatch(deleteLocal(key)),
-    onSetRandomTime: data => dispatch(setRandomTime(data)),
     onCheckLocal: data => dispatch(checkLocal(data)),
     onCreateDialogVisible: () => dispatch(createDialogVisible()),
     onReceiveBossChanged: boss => dispatch(receiveBossChanged(boss)),
     onReceiveBossAdded: boss => dispatch(receiveBossAdded(boss)),
     onReceiveBossRemoved: boss => dispatch(receiveBossRemove(boss)),
+    onOpenRandomDialog: (boss) => dispatch(setRandomBoss(boss)),
     
     onDeleteBoss: (userId, bossKey)=> dispatch(startLoading()) | dispatch(deleteBoss(userId, bossKey)),
     onKillBoss: (userId, bossKey) => dispatch(startLoading()) | dispatch(killBoss(userId, bossKey)),
     onGetAllBoss: (userId) => dispatch(startLoading()) |  dispatch(getAllBoss(userId)),
-    onSetBossRandomTime: (userId, bossKey, randomTime) => dispatch(startLoading()) |  dispatch(setBossRandomTime(userId, bossKey, randomTime)),
+    
 })
 
 export default connect(mapState2Props, mapDispatch2Props)(BossTable)

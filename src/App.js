@@ -19,6 +19,7 @@ import MainHeader from './component/MainHeader'
 const CreateBossDialog = asyncComponent(import('./component/CreateBossDialog'))
 const Local2CloudDialog = asyncComponent(import('./component/Local2CloudDialog'))
 const EditBossDialog = asyncComponent(import('./component/EditBossDialog'))
+const RandomDialog = asyncComponent(import('./component/RandomDialog'))
 
 const styles = {
   content: {
@@ -39,6 +40,7 @@ function App() {
               <BossTable />
               <Local2CloudDialog />
               <EditBossDialog /> 
+              <RandomDialog /> 
             </Content>
           </Layout>
           </Route>

@@ -3,6 +3,13 @@ import {
     Dialog, Button 
 } from 'element-react/next'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import {
+    setRandomDialogVisible,
+    setRandomTime,
+    setBossRandomTime,
+    setRandomBoss,
+} from '../common/actions'
 
 const styles = {
     button: {
@@ -25,18 +32,33 @@ function createButton(choiceNum, num, onChoice, onCancel) {
 }
 
 function RandomDialog(props) {
-    const { isShowDialog, onCancel, onChoice, choiceNum = 0 } = props
+    const { 
+        user, 
+        onCancel, 
+        onSetRandomTime,
+        onSetBossRandomTime,
+        boss,
+    } = props
+
+    const onChoice = (num) => {
+        if (user) {
+          onSetBossRandomTime(user.uid, boss.key, num)
+        } else {
+          onSetRandomTime({num, key: boss.key})
+        }
+        onCancel()
+      }
     
-    const buttons1 = isShowDialog ?  [0, 1, 2, 3, 4, 5].map(num => (
-        createButton(choiceNum, num, onChoice, onCancel)
+    const buttons1 = !!boss ?  [0, 1, 2, 3, 4, 5].map(num => (
+        createButton(boss.randomTime, num, onChoice, onCancel)
     )) : null
-    const buttons2 = isShowDialog ?  [6, 7, 8, 9, 10].map(num => (
-        createButton(choiceNum, num, onChoice, onCancel)
+    const buttons2 = !!boss ?  [6, 7, 8, 9, 10].map(num => (
+        createButton(boss.randomTime, num, onChoice, onCancel)
     )) : null
     return (
         <Dialog
             title='隨機數'
-            visible={isShowDialog}
+            visible={!!boss}
             onCancel={() => onCancel && onCancel()}
             size={'tiny'}
         >
@@ -49,12 +71,26 @@ function RandomDialog(props) {
 }
 
 RandomDialog.propTypes = {
+    user: PropTypes.object,
+    boss: PropTypes.object,
     isShowDialog: PropTypes.bool,
     onCancel: PropTypes.func,
     onChoice: PropTypes.func,
     choiceNum: PropTypes.number,
+    onSetRandomTime: PropTypes.func.isRequired,
+    onSetBossRandomTime: PropTypes.func.isRequired,
 }
 
+const mapState2Props = state => ({
+    user: state.user,
+    boss: state.randomBoss,
+})
 
-export default RandomDialog
+const mapDispatch2Props = dispatch => ({
+    onCancel: () => dispatch(setRandomBoss(null)),
+    onSetRandomTime: data => dispatch(setRandomTime(data)),
+    onSetBossRandomTime: (userId, bossKey, randomTime) => dispatch(setBossRandomTime(userId, bossKey, randomTime)),
+})
+
+export default connect(mapState2Props, mapDispatch2Props)(RandomDialog)
 
