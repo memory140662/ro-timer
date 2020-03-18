@@ -11,7 +11,7 @@ import {
 
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { createEdit, createBoss, create, startLoading, createDialogInvisible } from '../common/actions'
+import { createEdit, createBoss, create, startLoading, createDialogInvisible, setCreateDialogVisible } from '../common/actions'
 
 const styles = {
     form: {
@@ -149,7 +149,7 @@ const mapDispatch2Props = dispatch => ({
     onCreateBoss: (id, data) => dispatch(startLoading()) & dispatch(createBoss(id, data)),
     onCreate: (data) => dispatch(create(data)),
     onEdit: (data) => dispatch(createEdit(data)),
-    onCancel: () => dispatch(createDialogInvisible())
+    onCancel: () => dispatch(setCreateDialogVisible(false))
 })
 
 export default connect(mapState2Props, mapDispatch2Props)(CreateBossDialog)

@@ -5,7 +5,6 @@ import {
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
-    setRandomDialogVisible,
     setRandomTime,
     setBossRandomTime,
     setRandomBoss,
@@ -73,10 +72,7 @@ function RandomDialog(props) {
 RandomDialog.propTypes = {
     user: PropTypes.object,
     boss: PropTypes.object,
-    isShowDialog: PropTypes.bool,
-    onCancel: PropTypes.func,
-    onChoice: PropTypes.func,
-    choiceNum: PropTypes.number,
+    onCancel: PropTypes.func.isRequired,
     onSetRandomTime: PropTypes.func.isRequired,
     onSetBossRandomTime: PropTypes.func.isRequired,
 }

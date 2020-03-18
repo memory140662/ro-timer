@@ -24,7 +24,6 @@ const initState = {
     isAuthChanging: false,
     isCreateDialogVisible: false,
     error: null,
-    isRandomDialogVisible: false,
 }
 
 const createHandler = (state, payload) => {
@@ -124,6 +123,10 @@ const loadHandler = (state) => {
         data: { $set: data },
         isLoading: { $set: false },
     })
+}
+
+const setUserHandler = (state, payload) => {
+    return update(state, {user: {$set: payload}})
 }
 
 const setRandomTime = (state, payload) => {
@@ -242,17 +245,16 @@ const receiveBossRemovedHandler = (state, payload) => {
     })
 }
 
-const setRandomDialogVisible = (state, payload) => {
-
-    return update(state, {
-        isRandomDialogVisible: { $set: payload },
-    })
-}
-
 const setRandomBoss = (state, payload) => {
 
     return update(state, {
         randomBoss: { $set: payload },
+    })
+}
+
+const setCreateDialogVisible = (state, payload) => {
+    return update(state, {
+        isCreateDialogVisible: { $set: payload },
     })
 }
 
@@ -268,7 +270,7 @@ export default handleActions({
     [types.TYPE_DELETE]: (state, { payload }) => deleteBossHandler(state, payload),
     [types.TYPE_CREATE_EDIT]: (state, { payload }) => createEditHandler(state, payload),
     [types.TYPE_SORT_DATA]: (state, { payload }) => sortDataHandler(state, payload),
-    
+    [types.TYPE_SET_USER]: (state, { payload }) => setUserHandler(state, payload),
     [types.TYPE_START_LOADING]: state => startLoadingHandler(state),
     [types.TYPE_CHECK_LOCAL]: state => checkLocalHandler(state),
     [types.TYPE_DELETE_LOCAL_DATA]: (state) => deleteLocalDataHandler(state),
@@ -276,8 +278,8 @@ export default handleActions({
     [types.TYPE_RECEIVE_BOSS_CHANGED]: (state, { payload }) => receiveBossChangedHandler(state, payload),
     [types.TYPE_RECEIVE_BOSS_ADDED]: (state, { payload }) => receiveBossAddedHandler(state, payload),
     [types.TYPE_RECEIVE_BOSS_REMOVED]: (state, { payload }) => receiveBossRemovedHandler(state, payload),
-    [types.TYPE_SET_RANDOM_DIALOG_VISIBLE]: (state, { payload }) => setRandomDialogVisible(state, payload),
     [types.TYPE_SET_RANDOM_BOSS]: (state, { payload }) => setRandomBoss(state, payload),
+    [types.TYPE_SET_CREATE_DIALOG_VISIBLE]: (state, { payload }) => setCreateDialogVisible(state, payload),
     // pending
     [asyncPending(types.TYPE_SIGN_IN_USER)]: (state) => pendingHandler(state),
     [asyncPending(types.TYPE_SIGN_OUT_USER)]: (state) => pendingHandler(state),
