@@ -351,9 +351,9 @@ const mapDispatch2Props = dispatch => ({
     onReceiveBossRemoved: boss => dispatch(receiveBossRemove(boss)),
     onOpenRandomDialog: (boss) => dispatch(setRandomBoss(boss)),
     
-    onDeleteBoss: (userId, bossKey)=> dispatch(startLoading()) | dispatch(deleteBoss(userId, bossKey)),
-    onKillBoss: (userId, bossKey) => dispatch(startLoading()) | dispatch(killBoss(userId, bossKey)),
-    onGetAllBoss: (userId) => dispatch(startLoading()) |  dispatch(getAllBoss(userId)),
+    onDeleteBoss: (userId, bossKey)=> dispatch(deleteBoss(userId, bossKey)),
+    onKillBoss: (userId, bossKey) => dispatch(killBoss(userId, bossKey)),
+    onGetAllBoss: (userId) => dispatch(getAllBoss(userId)),
     
 })
 

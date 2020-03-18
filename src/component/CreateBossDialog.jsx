@@ -1,5 +1,5 @@
 import React, {
-    useRef
+    useRef, useState
 } from 'react'
 
 import { 
@@ -11,7 +11,7 @@ import {
 
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { createEdit, createBoss, create, startLoading, createDialogInvisible, setCreateDialogVisible } from '../common/actions'
+import { createBoss, create, setCreateDialogVisible } from '../common/actions'
 
 const styles = {
     form: {
@@ -44,8 +44,6 @@ const CREATE_BOSS_RULES = {
 function CreateBossDialog(props) {
     const { 
         onCreate, 
-        form, 
-        onEdit, 
         onCreateBoss, 
         user, 
         isCreateDialogVisible ,
@@ -53,6 +51,9 @@ function CreateBossDialog(props) {
     } = props
     const formRef = useRef()
     const timeRef = useRef()
+    const [ form, setForm ] = useState({
+        name: null,
+    })
 
     const submitHandler = e => {
         e.preventDefault()
@@ -99,7 +100,7 @@ function CreateBossDialog(props) {
                     <Form.Item label={'請輸入BOSS名稱'} style={styles.name} prop={'name'}>
                         <Input 
                             style={styles.input}
-                            onChange={e => onEdit({...form, name: e})}
+                            onChange={e => setForm({...form, name: e})}
                             placeholder={'請輸入BOSS名稱'}
                             value={form.name} 
                         />
@@ -135,7 +136,6 @@ CreateBossDialog.propTypes = {
 
     onCreate: PropTypes.func.isRequired,
     onCreateBoss: PropTypes.func.isRequired,
-    onEdit: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
 }
 
@@ -146,9 +146,8 @@ const mapState2Props = state => ({
 })
 
 const mapDispatch2Props = dispatch => ({
-    onCreateBoss: (id, data) => dispatch(startLoading()) & dispatch(createBoss(id, data)),
+    onCreateBoss: (id, data) => dispatch(createBoss(id, data)),
     onCreate: (data) => dispatch(create(data)),
-    onEdit: (data) => dispatch(createEdit(data)),
     onCancel: () => dispatch(setCreateDialogVisible(false))
 })
 

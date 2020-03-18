@@ -8,7 +8,7 @@ import {
 import PropTypes from 'prop-types'
 
 import {
-    uploadToCloud, deleteLocalData, startLoading
+    uploadToCloud, deleteLocalData
 } from '../common/actions'
 
 
@@ -57,7 +57,7 @@ const mapState2Props = state => ({
 })
 
 const mapDispatch2Props = dispatch => ({
-    onUploadToCloud: (userId, data) => dispatch(startLoading()) & dispatch(uploadToCloud(userId, data)),
+    onUploadToCloud: (userId, data) => dispatch(uploadToCloud(userId, data)),
     onDeleteLocalData: () => dispatch(deleteLocalData()),
 })
 

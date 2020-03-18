@@ -11,10 +11,6 @@ import {
 } from './constants'
 
 const initState = {
-    form: {
-        name: null,
-        cd: null,
-    },
     data: [],
     currentBoss: null,
     randomBoss: null,
@@ -35,7 +31,6 @@ const createHandler = (state, payload) => {
     })
     return update(state, { 
         data: { $push: [ newBoss ] }, 
-        form: { $set: initState.form }
     })
 }
 
@@ -48,7 +43,6 @@ const createBossHandler = (state, payload) => {
 
     return update(state, { 
         data: { $push: [ payload ] }, 
-        form: { $set: initState.form },
         isLoading: { $set: false },
     })
 }
@@ -90,10 +84,6 @@ const deleteBossHandler = (state, key) => {
         data: { $set: data },
         isLoading: { $set: false },
     })
-}
-
-const createEditHandler = (state, payload) => {
-    return update(state, {form: {$set: payload}})
 }
 
 const sortDataHandler = (state, payload) => {
@@ -268,7 +258,6 @@ export default handleActions({
     [types.TYPE_EDIT_CONFIRM]: (state, { payload }) => editConfirmHandler(state, payload),
     [types.TYPE_SAVE_DATA]: state => saveHandler(state),
     [types.TYPE_DELETE]: (state, { payload }) => deleteBossHandler(state, payload),
-    [types.TYPE_CREATE_EDIT]: (state, { payload }) => createEditHandler(state, payload),
     [types.TYPE_SORT_DATA]: (state, { payload }) => sortDataHandler(state, payload),
     [types.TYPE_SET_USER]: (state, { payload }) => setUserHandler(state, payload),
     [types.TYPE_START_LOADING]: state => startLoadingHandler(state),
