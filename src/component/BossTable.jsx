@@ -29,12 +29,9 @@ import {
   getAllBoss,
   killBoss,
   startLoading,
-  editCancel,
-  updateBoss,
   save,
   kill,
   deleteLocal,
-  editConfirm,
   setRandomTime,
   checkLocal,
   createDialogVisible,
@@ -46,7 +43,6 @@ import {
 import asyncComponent from '../hoc/asyncComponent'
 
 const RandomDialog = asyncComponent(import('./RandomDialog'))
-const EditBossDialog = asyncComponent(import('./EditBossDialog'))
 
 const styles = {
   table: {
@@ -127,15 +123,12 @@ function BossTable(props) {
       data,
       user, 
       isLoading,
-      currentBoss,
 
       onLoad,
       onSort, 
       onEdit, 
       onSave,
-      onCancel,
       onKill,
-      onEditConfirm,
       onDelete,
       onSetRandomTime,
       onCheckLocal,
@@ -147,7 +140,6 @@ function BossTable(props) {
       onDeleteBoss, 
       onKillBoss, 
       onGetAllBoss,
-      onUpdateBoss,
       onSetBossRandomTime, 
     } = props
     const tableRef = useRef()
@@ -254,14 +246,6 @@ function BossTable(props) {
       }
     }
 
-    const editHandler = (uid, bossKey, data) => {
-      if (uid) {
-        onUpdateBoss(uid, bossKey, data)
-      } else {
-        onEditConfirm({...data, key: bossKey})
-      }
-    }
-
     const killHandler = (uid, bossKey) => {
       if (uid) {
         onKillBoss(uid, bossKey)
@@ -354,12 +338,6 @@ function BossTable(props) {
             onChoice={num => setRandomTimeHandler(user && user.uid, randomData.key, num)}
             choiceNum={randomData.num}
           />
-          <EditBossDialog 
-              boss={currentBoss}
-              user={user}
-              onCancel={onCancel}
-              onUpdateBoss={editHandler}
-          /> 
         </>
     )
 }
@@ -368,15 +346,12 @@ BossTable.propTypes = {
     data: PropTypes.array.isRequired,
     user: PropTypes.object,
     isLoading: PropTypes.bool.isRequired,
-    currentBoss: PropTypes.object,
 
     onLoad: PropTypes.func.isRequired,
     onSort: PropTypes.func.isRequired,
     onEdit: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired,
     onKill: PropTypes.func.isRequired,
-    onEditConfirm: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     onSetRandomTime: PropTypes.func.isRequired,
     onCheckLocal: PropTypes.func.isRequired,
@@ -386,7 +361,6 @@ BossTable.propTypes = {
     onDeleteBoss: PropTypes.func.isRequired,
     onKillBoss: PropTypes.func.isRequired,
     onGetAllBoss: PropTypes.func.isRequired,
-    onUpdateBoss: PropTypes.func.isRequired,
     onSetBossRandomTime: PropTypes.func.isRequired,
 }
 
@@ -402,9 +376,7 @@ const mapDispatch2Props = dispatch => ({
     onSort: data => dispatch(sortDate(data)),
     onEdit: key => dispatch(edit(key)),
     onSave: () => dispatch(save()),
-    onCancel: () => dispatch(editCancel()),
     onKill: key => dispatch(kill(key)),
-    onEditConfirm: data => dispatch(editConfirm(data)),
     onDelete: key => dispatch(deleteLocal(key)),
     onSetRandomTime: data => dispatch(setRandomTime(data)),
     onCheckLocal: data => dispatch(checkLocal(data)),
@@ -416,7 +388,6 @@ const mapDispatch2Props = dispatch => ({
     onDeleteBoss: (userId, bossKey)=> dispatch(startLoading()) | dispatch(deleteBoss(userId, bossKey)),
     onKillBoss: (userId, bossKey) => dispatch(startLoading()) | dispatch(killBoss(userId, bossKey)),
     onGetAllBoss: (userId) => dispatch(startLoading()) |  dispatch(getAllBoss(userId)),
-    onUpdateBoss: (userId, bossKey, data) => dispatch(startLoading()) | dispatch(updateBoss(userId, bossKey, data)),
     onSetBossRandomTime: (userId, bossKey, randomTime) => dispatch(startLoading()) |  dispatch(setBossRandomTime(userId, bossKey, randomTime)),
 })
 

@@ -4,12 +4,19 @@ import {
     Dialog,  
     Button
 } from 'element-react/next'
+import { connect } from 'react-redux'
 
 import { TimePicker } from 'antd'
 import moment from 'moment-timezone'
 
 import PropTypes from 'prop-types'
 import { TIME_FORMAT } from '../common/constants'
+
+import {
+    editCancel,
+    editConfirm,
+    updateBoss,
+} from '../common/actions'
 
 
 const styles = {
@@ -25,7 +32,7 @@ const styles = {
 }
 
 function EditBossDialog(props) {
-    const { boss, onCancel, onUpdateBoss, user } = props
+    const { boss, onCancel, onUpdateBoss, user, onEditConfirm } = props
 
     const editDealTimeRef = useRef()
     const editCdRef = useRef()
@@ -33,10 +40,15 @@ function EditBossDialog(props) {
 
     const submitHandler = e => {
         e.preventDefault()
-        onUpdateBoss(user && user.uid, boss.key, {
+        const data = {
             cd: editCdRef.current.value.length ? +editCdRef.current.value : null,
             dealTime: dealTime && moment(dealTime).format(TIME_FORMAT),
-        })
+        }
+        if (user) {
+            onUpdateBoss(user.uid, boss.key, data)
+        } else {
+            onEditConfirm({...data, key: boss.key})
+        }
         onCancel()
     }
 
@@ -93,8 +105,20 @@ EditBossDialog.propTypes = {
     user: PropTypes.object,
     onCancel: PropTypes.func.isRequired,
     onUpdateBoss: PropTypes.func.isRequired,
+    onEditConfirm: PropTypes.func.isRequired,
 }
 
-export default EditBossDialog
+const mapState2Props = state => ({
+    boss: state.currentBoss,
+    user: state.user,
+})
+
+const mapDispatch2Props = dispatch => ({
+    onCancel: () => dispatch(editCancel()),
+    onEditConfirm: (data) => dispatch(editConfirm(data)),
+    onUpdateBoss: (userId, bossKey, data) => dispatch(updateBoss(userId, bossKey, data)),
+})
+
+export default connect(mapState2Props, mapDispatch2Props)(EditBossDialog)
 
 

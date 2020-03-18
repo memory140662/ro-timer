@@ -18,6 +18,7 @@ import MainHeader from './component/MainHeader'
 
 const CreateBossDialog = asyncComponent(import('./component/CreateBossDialog'))
 const Local2CloudDialog = asyncComponent(import('./component/Local2CloudDialog'))
+const EditBossDialog = asyncComponent(import('./component/EditBossDialog'))
 
 const styles = {
   content: {
@@ -30,13 +31,14 @@ function App() {
   return (
     <Router>
       <Switch>
-        <Route>
+        <Route path={['/:id', '/']}>
           <Layout className='layout'>
             <MainHeader />
             <Content style={styles.content}>
               <CreateBossDialog />
               <BossTable />
               <Local2CloudDialog />
+              <EditBossDialog /> 
             </Content>
           </Layout>
           </Route>
