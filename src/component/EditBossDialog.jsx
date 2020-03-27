@@ -69,6 +69,11 @@ function EditBossDialog(props) {
             <Form onSubmit={submitHandler} >
                 <Dialog.Body>
                     <Form.Item label={'死亡時間'} style={styles.time} labelWidth={'120'}>
+                        <style>{`
+                            .ant-picker-now {
+                                visibility: hidden;
+                            }
+                        `}</style>
                         <TimePicker
                             style={styles.input}
                             onChange={e => setDealTime(e)}

@@ -131,7 +131,6 @@ function CreateBossDialog(props) {
 
 CreateBossDialog.propTypes = {
     user: PropTypes.object,
-    form: PropTypes.object.isRequired,
     isCreateDialogVisible: PropTypes.bool.isRequired,
 
     onCreate: PropTypes.func.isRequired,
@@ -140,7 +139,6 @@ CreateBossDialog.propTypes = {
 }
 
 const mapState2Props = state => ({
-    form: state.form,
     user: state.user,
     isCreateDialogVisible: state.isCreateDialogVisible
 })

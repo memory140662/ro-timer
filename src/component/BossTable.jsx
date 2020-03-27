@@ -7,18 +7,19 @@ import { connect } from 'react-redux'
 
 import {
     Input,
-    Button
+    Button as EButton
 } from 'element-react/next'
 
 import { useLocation } from 'react-router-dom'
 
-import { Table } from 'antd'
+import { Table, Button } from 'antd'
 import { DndProvider, useDrag, useDrop } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 import update from 'immutability-helper'
 import { database } from '../common/api'
 
 import PropTypes from 'prop-types'
+import moment from 'moment-timezone'
 
 import { 
   load,
@@ -38,6 +39,8 @@ import {
   receiveBossRemove,
   setRandomBoss
 } from '../common/actions'
+import ConfirmDialog from './ConfirmDialog'
+import { TIME_FORMAT } from '../common/constants'
 
 const styles = {
   table: {
@@ -58,13 +61,15 @@ const styles = {
     margin: '10px'
   },
   randomButton: {
-    width: '50px',
     color: '#000'
   },
   randomButtonDisable: {
-    width: '50px',
-    color: '#000'
-  }
+    color: '#000',
+    cursor: 'default',
+  },
+  confirmDialogMessage: {
+    fontSize: '14px',
+  },
 }
 
 const type = 'DragbleBodyRow'
@@ -139,6 +144,7 @@ function BossTable(props) {
     const tableRef = useRef()
     const [tableHeight, setTableHeight] = useState(0)
     const [search, setSearch] = useState(null)
+    const [deleteBoss, setDeleteBoss] = useState(null)
 
     const query = useQuery()
     const id = query.get('id')
@@ -201,7 +207,7 @@ function BossTable(props) {
 
     useEffect(() => {
       if (!tableHeight && tableRef && tableRef.current) {
-        setTableHeight(window.outerHeight - tableRef.current.offsetTop - 170)
+        setTableHeight(window.innerHeight - (tableRef.current.offsetTop + 50 + 10))
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tableRef])
@@ -255,11 +261,11 @@ function BossTable(props) {
                 trim
                 onIconClick={() => setSearch(null)}
             />
-            {isEditable ? <Button 
+            {isEditable ? <EButton 
               size={'large'}
               icon={'plus'} 
               onClick={onCreateDialogVisible}
-              style={styles.createButton}>新增</Button> : null}
+              style={styles.createButton}>新增</EButton> : null}
           </div>
           <div style={styles.tableOutside} ref={tableRef}>
             <DndProvider backend={HTML5Backend}>
@@ -280,14 +286,43 @@ function BossTable(props) {
                 pagination={false}
                 scroll={{ y: tableHeight }}
               >
-                <Table.Column title={'名稱'} dataIndex={'name'} key={'name'} width={100} render={column}/>
+                <Table.Column title={'名稱'} dataIndex={'name'} key={'name'} width={100} render={column} />
                 <Table.Column align={'center'} title={'死亡時間'} dataIndex={'dealTime'} key={'dealTime'} width={120} render={column}/>
-                <Table.Column align={'center'} title={'重生時間'} dataIndex={'nextTime'} key={'nextTime'} width={120} render={column}/>
+                <Table.Column 
+                  align={'center'} 
+                  title={'重生時間'} 
+                  dataIndex={'nextTime'} 
+                  key={'nextTime'} 
+                  width={120} 
+                  render={column}
+                  sortDirections={['ascend']}
+                  sorter={(a, b) => {
+                    if (!a.nextTime && !b.nextTime) {
+                      return 0
+                    }
+
+                    if (!b.nextTime) {
+                      return -1
+                    }
+
+                    if (!a.nextTime) {
+                      return 1
+                    }
+                    
+                    if (moment(a.nextTime, TIME_FORMAT).isBefore(moment(b.nextTime, TIME_FORMAT))) {
+                      return -1
+                    }
+
+                    return 1
+                  }}
+                />
                 <Table.Column title={'冷卻時間(分鐘)'} dataIndex={'cd'} key={'cd'} width={150} render={column}/>
-                <Table.Column dataIndex={'randomTime'} key={'randomTime'} width={65} render={(_, data) => (
-                  <Button 
+                <Table.Column align={'center'} dataIndex={'randomTime'} key={'randomTime'} width={65} render={(_, data) => (
+                  <Button
+                    size={'middle'}
+                    shape={'circle'} 
                     disabled={!isEditable}
-                    type={isEditable ? null : 'text'}
+                    type={isEditable ? null : 'link'}
                     onClick={() => onOpenRandomDialog(data)} 
                     style={isEditable ? styles.randomButton : styles.randomButtonDisable}
                   >{data.randomTime || 0}</Button>
@@ -295,14 +330,25 @@ function BossTable(props) {
                 <Table.Column title={'操作'} dataIndex={'opt'} key={'opt'} width={320} render={(_, data) => (
                   isEditable ? 
                   <>
-                    <Button icon={'check'} type={'success'} onClick={() => killHandler(user && user.uid, data.key)}>擊殺</Button>
-                    <Button icon={'edit'} type={'info'} onClick={() => onEdit(data.key)}>編輯</Button>
-                    <Button icon={'delete'} type={'danger'} onClick={() => deleteHandler(user && user.uid, data.key)}>刪除</Button>
+                    <EButton icon={'check'} type={'success'} onClick={() => killHandler(user && user.uid, data.key)}>擊殺</EButton>
+                    <EButton icon={'edit'} type={'info'} onClick={() => onEdit(data.key)}>編輯</EButton>
+                    <EButton icon={'delete'} type={'danger'} onClick={() => setDeleteBoss(data)}>刪除</EButton>
                   </>
                   : null
                 )}/>
               </Table>
             </DndProvider>
+            <ConfirmDialog 
+              title={deleteBoss ? deleteBoss.name : null}
+              visible={!!deleteBoss}
+              message={() => (
+                <div style={styles.confirmDialogMessage}>
+                  是否刪除 <strong>{deleteBoss ? deleteBoss.name : null}</strong> ?
+                </div>
+              )} 
+              onCancel={() => setDeleteBoss(null)}
+              onConfirm={() => deleteHandler(user && user.uid, deleteBoss.key)}
+            />
           </div>
         </>
     )

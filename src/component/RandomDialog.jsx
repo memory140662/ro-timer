@@ -1,7 +1,10 @@
 import React from 'react'
+import { Dialog } from 'element-react/next'
 import { 
-    Dialog, Button 
-} from 'element-react/next'
+    Button,
+    Row,
+    Col
+} from 'antd'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
@@ -10,24 +13,29 @@ import {
     setRandomBoss,
 } from '../common/actions'
 
-const styles = {
-    button: {
-        margin: 5,
-        height: 50,
-        width: 50,
+const renderButton = (choiceNum, onChoice, onCancel) => {
+    const buttons = []
+    for (let i = 0; i <= 20; i++) {
+        buttons.push(
+            <Col key={i}>
+                <Button 
+                    key={i}
+                    size={'large'}
+                    shape={'circle'}
+                    type={(choiceNum === i) ? 'primary' : null} 
+                    onClick={() => {
+                        onChoice && onChoice(i)
+                        onCancel && onCancel()
+                    }}
+                >{i}</Button>
+            </Col>
+        )
     }
-}
-
-function createButton(choiceNum, num, onChoice, onCancel) {
-    return <Button 
-        key={num}
-        style={styles.button} 
-        type={(choiceNum === num) ? 'info' : null} 
-        onClick={() => {
-            onChoice && onChoice(num)
-            onCancel && onCancel()
-        }}
-    >{num}</Button>
+    return (
+        <Row gutter={[16, 16]}>
+            {buttons}
+        </Row>
+    )
 }
 
 function RandomDialog(props) {
@@ -46,14 +54,8 @@ function RandomDialog(props) {
           onSetRandomTime({num, key: boss.key})
         }
         onCancel()
-      }
-    
-    const buttons1 = !!boss ?  [0, 1, 2, 3, 4, 5].map(num => (
-        createButton(boss.randomTime, num, onChoice, onCancel)
-    )) : null
-    const buttons2 = !!boss ?  [6, 7, 8, 9, 10].map(num => (
-        createButton(boss.randomTime, num, onChoice, onCancel)
-    )) : null
+    }
+
     return (
         <Dialog
             title='隨機數'
@@ -62,8 +64,7 @@ function RandomDialog(props) {
             size={'tiny'}
         >
             <Dialog.Body>
-                <div>{buttons1}</div>
-                <div>{buttons2}</div>
+                {renderButton(boss ? boss.randomTime : 0, onChoice, onCancel)}
             </Dialog.Body>
         </Dialog>
     )
