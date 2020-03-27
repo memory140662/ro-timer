@@ -119,7 +119,9 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "pre-commit": "^1.2.2"
+  },
   "jest": {
     "roots": [
       "<rootDir>/src"
@@ -172,5 +174,6 @@
     "presets": [
       "react-app"
     ]
-  }
+  },
+  "pre-commit": ["fix"]
 }
