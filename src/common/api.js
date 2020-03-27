@@ -47,7 +47,7 @@ export const createBoss = async (userId, payload) => {
     const newBoss = Service.createBoss({
         ...payload,
         idx: reference.key,
-        key: reference.key
+        key: reference.key,
     })
     await firebase.database().ref(path).child(reference.key).update(newBoss)
 

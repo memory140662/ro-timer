@@ -11,7 +11,7 @@ import {
 import {
   BrowserRouter as Router,
   Switch,
-  Route
+  Route,
 } from 'react-router-dom'
 
 import MainHeader from './component/MainHeader'
@@ -23,8 +23,8 @@ const RandomDialog = asyncComponent(import('./component/RandomDialog'))
 
 const styles = {
   content: {
-    minHeight: window.innerHeight - 64
-  }
+    minHeight: window.innerHeight - 64,
+  },
 }
 
 const { Content } = Layout

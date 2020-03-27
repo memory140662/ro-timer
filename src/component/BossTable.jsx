@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 
 import {
     Input,
-    Button as EButton
+    Button as EButton,
 } from 'element-react/next'
 
 import { useLocation } from 'react-router-dom'
@@ -37,7 +37,7 @@ import {
   receiveBossChanged,
   receiveBossAdded,
   receiveBossRemove,
-  setRandomBoss
+  setRandomBoss,
 } from '../common/actions'
 import ConfirmDialog from './ConfirmDialog'
 import { TIME_FORMAT } from '../common/constants'
@@ -48,7 +48,7 @@ const styles = {
   },
   search: {
     width: 350,
-    margin: 10
+    margin: 10,
   },
   tableOutside: {
     margin: 10,
@@ -58,10 +58,10 @@ const styles = {
   },
   createButton: {
     float: 'right', 
-    margin: '10px'
+    margin: '10px',
   },
   randomButton: {
-    color: '#000'
+    color: '#000',
   },
   randomButtonDisable: {
     color: '#000',

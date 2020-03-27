@@ -2,7 +2,7 @@ import moment from 'moment-timezone'
 
 import {
     TIME_FORMAT,
-    TIME_NUM_FORMAT
+    TIME_NUM_FORMAT,
 } from './constants'
 
 class Service {
@@ -71,7 +71,7 @@ class Service {
             randomTime: 0,
             cd: inputBoss.cd || 0,
             idx: inputBoss.key,
-            key: inputBoss.key
+            key: inputBoss.key,
         }
     }
 }

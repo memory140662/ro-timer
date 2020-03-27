@@ -2,13 +2,13 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import {
     Dialog,
-    Button
+    Button,
 } from 'element-react/next'
 
 import PropTypes from 'prop-types'
 
 import {
-    uploadToCloud, deleteLocalData
+    uploadToCloud, deleteLocalData,
 } from '../common/actions'
 
 
@@ -53,7 +53,7 @@ Local2CloudDialog.propTypes = {
 
 const mapState2Props = state => ({
     user: state.user,
-    localData: state.localData
+    localData: state.localData,
 })
 
 const mapDispatch2Props = dispatch => ({

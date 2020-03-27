@@ -3,7 +3,7 @@ import { Dialog } from 'element-react/next'
 import { 
     Button,
     Row,
-    Col
+    Col,
 } from 'antd'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'

@@ -50,7 +50,7 @@ const createBossHandler = (state, payload) => {
 const editHandler = (state, key) => {
     return {
         ...state, 
-        currentBoss: state.data.find(boss => boss.key === key)
+        currentBoss: state.data.find(boss => boss.key === key),
     }
 }
 
@@ -73,7 +73,7 @@ const saveHandler = state => {
     cookie.save(COOKIE_NAME_BOSS_TIME, state.data, { 
         path: '/',
         expires: moment().add(1, 'year').toDate(),
-        secure: process.env.NODE_ENV !== 'development'
+        secure: process.env.NODE_ENV !== 'development',
     })
     return state
 }
@@ -93,13 +93,13 @@ const sortDataHandler = (state, payload) => {
 const getAllBossHandler = (state, payload, error) => {
     if (error) {
         return update(state, {
-            isLoading: {$set: false}
+            isLoading: {$set: false},
         })
     }
 
     return update(state, {
         data: {$set: payload},
-        isLoading: {$set: false}
+        isLoading: {$set: false},
     })
 }
 
@@ -127,7 +127,7 @@ const setRandomTime = (state, payload) => {
     const boss = state.data[index]
     const newBoss = Service.setBossRandomTime(boss, payload.num)
     return update(state, {
-        data: { $splice: [[index, 1, newBoss]] }
+        data: { $splice: [[index, 1, newBoss]] },
     })
 }
 
@@ -152,7 +152,7 @@ const killHandler = (state, key) => {
     const boss = state.data[index]
     const newBoss = Service.killBoss(boss)
     return update(state, {
-        data: { $splice: [[index, 1, newBoss]] }
+        data: { $splice: [[index, 1, newBoss]] },
     })
 }
 
@@ -160,7 +160,7 @@ const checkLocalHandler = (state) => {
     const data = cookie.load(COOKIE_NAME_BOSS_TIME)
     if (data && data.length > 0) {
         return update(state, {
-            localData: { $set: data }
+            localData: { $set: data },
         })
     }
 
@@ -185,7 +185,7 @@ const deleteLocalDataHandler = (state) => {
 
 const setAuthChangingHandler = (state, payload) => {
     return update(state, {
-        isAuthChanging: { $set: payload }
+        isAuthChanging: { $set: payload },
     })
 }
 
@@ -210,7 +210,7 @@ const receiveBossChangedHandler = (state, payload) => {
     }
 
     return update(state, {
-        data: { $splice: [[index, 1, payload]] }
+        data: { $splice: [[index, 1, payload]] },
     })
 }
 
@@ -231,7 +231,7 @@ const receiveBossRemovedHandler = (state, payload) => {
     }
 
     return update(state, {
-        data: { $splice: [[index, 1]] }
+        data: { $splice: [[index, 1]] },
     })
 }
 

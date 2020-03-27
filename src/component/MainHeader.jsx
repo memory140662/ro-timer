@@ -55,7 +55,7 @@ const styles = {
     img: {
         height: '24px',
         width: '24px',
-    }
+    },
 }
 
 const { Header } = Layout
@@ -157,14 +157,14 @@ MainHeader.propTypes = {
 
 const mapState2Props = state => ({
     user: state.user,
-    isAuthChanging: state.isAuthChanging
+    isAuthChanging: state.isAuthChanging,
 })
 
 const mapDispatch2Props = dispatch => ({
     onSignInUser: () => dispatch(setAuthChanging(true)) & dispatch(signInUser()),
     onSignOutUser: () => dispatch(setAuthChanging(true)) & dispatch(signOutUser()),
     onSetUser: user => dispatch(setUser(user)),
-    onSetAuthChanging: isChanging => dispatch(setAuthChanging(isChanging))
+    onSetAuthChanging: isChanging => dispatch(setAuthChanging(isChanging)),
 })
 
 export default connect(mapState2Props, mapDispatch2Props)(MainHeader)

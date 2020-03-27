@@ -1,12 +1,12 @@
 import React, {
-    useRef, useState
+    useRef, useState,
 } from 'react'
 
 import { 
     Form,
     Input,
     Button,
-    Dialog
+    Dialog,
 } from 'element-react/next'
 
 import { connect } from 'react-redux'
@@ -19,7 +19,7 @@ const styles = {
     },
     name: {
       margin: 5,
-      height: 60
+      height: 60,
     },
     time: {
       margin: 5,
@@ -28,11 +28,11 @@ const styles = {
       margin: 5,
     },
     input: {
-        width: '200px'
+        width: '200px',
     },
     dialog: {
-        width: '450px'
-    }
+        width: '450px',
+    },
 }
 
 const CREATE_BOSS_RULES = {
@@ -47,7 +47,7 @@ function CreateBossDialog(props) {
         onCreateBoss, 
         user, 
         isCreateDialogVisible ,
-        onCancel
+        onCancel,
     } = props
     const formRef = useRef()
     const timeRef = useRef()
@@ -61,7 +61,7 @@ function CreateBossDialog(props) {
             if (valid) {
                 const data = {
                     ...form, 
-                    cd: timeRef.current.value.length ? +timeRef.current.value : 0
+                    cd: timeRef.current.value.length ? +timeRef.current.value : 0,
                 }
                 if (user) {
                     onCreateBoss(user.uid, data)
@@ -140,13 +140,13 @@ CreateBossDialog.propTypes = {
 
 const mapState2Props = state => ({
     user: state.user,
-    isCreateDialogVisible: state.isCreateDialogVisible
+    isCreateDialogVisible: state.isCreateDialogVisible,
 })
 
 const mapDispatch2Props = dispatch => ({
     onCreateBoss: (id, data) => dispatch(createBoss(id, data)),
     onCreate: (data) => dispatch(create(data)),
-    onCancel: () => dispatch(setCreateDialogVisible(false))
+    onCancel: () => dispatch(setCreateDialogVisible(false)),
 })
 
 export default connect(mapState2Props, mapDispatch2Props)(CreateBossDialog)

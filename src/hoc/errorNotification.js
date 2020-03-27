@@ -16,7 +16,7 @@ const errorNotification = (Cmp) => {
                     message: '發生異常',
                     description: error,
                     duration: 3.5,
-                    top: 65
+                    top: 65,
                 })
             }
         }

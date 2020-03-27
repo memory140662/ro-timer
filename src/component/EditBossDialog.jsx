@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react'
 import { 
     Form, 
     Dialog,  
-    Button
+    Button,
 } from 'element-react/next'
 import { connect } from 'react-redux'
 
@@ -28,7 +28,7 @@ const styles = {
     },
     dialog: {
         width: '450px',
-    }
+    },
 }
 
 function EditBossDialog(props) {
