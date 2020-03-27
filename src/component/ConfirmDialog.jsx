@@ -1,9 +1,5 @@
 import React from 'react'
 import { Dialog, Button } from 'element-react/next'
-import {
-    CloseOutlined,
-    CheckOutlined
-} from '@ant-design/icons'
 import PropTypes from 'prop-types'
 
 const styles = {
