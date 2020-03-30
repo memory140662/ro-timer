@@ -13,9 +13,8 @@ import {
 import { useLocation } from 'react-router-dom'
 
 import { Table, Button } from 'antd'
-import { DndProvider, useDrag, useDrop } from 'react-dnd'
+import { DndProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
-import update from 'immutability-helper'
 import { database } from '../common/api'
 
 import PropTypes from 'prop-types'
@@ -25,7 +24,6 @@ import {
   load,
   edit,
   deleteBoss,
-  sortDate,
   getAllBoss,
   killBoss,
   startLoading,
@@ -72,50 +70,6 @@ const styles = {
   },
 }
 
-const type = 'DragbleBodyRow'
-
-const DragableBodyRow = ({ index, moveRow, className, style, ...restProps }) => {
-  const ref = React.useRef()
-  const [{ isOver, dropClassName }, drop] = useDrop({
-    accept: type,
-    collect: monitor => {
-      const { index: dragIndex } = monitor.getItem() || {}
-      if (dragIndex === index) {
-        return {}
-      }
-      return {
-        isOver: monitor.isOver(),
-        dropClassName: dragIndex < index ? ' drop-over-downward' : ' drop-over-upward',
-      }
-    },
-    drop: item => {
-      moveRow(item.index, index)
-    },
-  })
-  const [, drag] = useDrag({
-    item: { type, index },
-    collect: monitor => ({
-      isDragging: monitor.isDragging(),
-    }),
-  })
-  drop(drag(ref))
-  return (
-    <tr
-      ref={ref}
-      className={`${className}${isOver ? dropClassName : ''}`}
-      style={{ cursor: 'move', ...style }}
-      {...restProps}
-    />
-  )
-}
-
-// eslint-disable-next-line
-const components = {
-  body: {
-    row: DragableBodyRow,
-  },
-}
-
 const useQuery = () => (new URLSearchParams(useLocation().search))
 
 function BossTable(props) {
@@ -125,7 +79,6 @@ function BossTable(props) {
       isLoading,
 
       onLoad,
-      onSort, 
       onEdit, 
       onSave,
       onKill,
@@ -212,18 +165,6 @@ function BossTable(props) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tableRef])
 
-    // eslint-disable-next-line
-    const moveRow = (dragIndex, hoverIndex) => {
-      const dragRow = data[dragIndex]
-  
-      onSort(update(data, {
-        $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, dragRow],
-        ],
-      }))
-    }
-
     const deleteHandler = (uid, bossKey) => {
       if (uid) {
         onDeleteBoss(uid, bossKey)
@@ -278,11 +219,6 @@ function BossTable(props) {
                 loading={isLoading}
                 style={{...styles.table}}
                 dataSource={data.filter(d => d.name && (!search || d.name.indexOf(search) !== -1))}
-                // components={components}
-                // onRow={(_, index) => ({
-                //   index,
-                //   moveRow: moveRow,
-                // })}
                 pagination={false}
                 scroll={{ y: tableHeight }}
               >
@@ -360,7 +296,6 @@ BossTable.propTypes = {
     isLoading: PropTypes.bool.isRequired,
 
     onLoad: PropTypes.func.isRequired,
-    onSort: PropTypes.func.isRequired,
     onEdit: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
     onKill: PropTypes.func.isRequired,
@@ -385,7 +320,6 @@ const mapState2Props = state => ({
 
 const mapDispatch2Props = dispatch => ({
     onLoad: () =>  dispatch(startLoading()) | dispatch(load()),
-    onSort: data => dispatch(sortDate(data)),
     onEdit: key => dispatch(edit(key)),
     onSave: () => dispatch(save()),
     onKill: key => dispatch(kill(key)),

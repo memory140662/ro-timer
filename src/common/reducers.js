@@ -86,10 +86,6 @@ const deleteBossHandler = (state, key) => {
     })
 }
 
-const sortDataHandler = (state, payload) => {
-    return update(state, {data: {$set: payload}})
-}
-
 const getAllBossHandler = (state, payload, error) => {
     if (error) {
         return update(state, {
@@ -258,7 +254,6 @@ export default handleActions({
     [types.TYPE_EDIT_CONFIRM]: (state, { payload }) => editConfirmHandler(state, payload),
     [types.TYPE_SAVE_DATA]: state => saveHandler(state),
     [types.TYPE_DELETE]: (state, { payload }) => deleteBossHandler(state, payload),
-    [types.TYPE_SORT_DATA]: (state, { payload }) => sortDataHandler(state, payload),
     [types.TYPE_SET_USER]: (state, { payload }) => setUserHandler(state, payload),
     [types.TYPE_START_LOADING]: state => startLoadingHandler(state),
     [types.TYPE_CHECK_LOCAL]: state => checkLocalHandler(state),

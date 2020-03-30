@@ -13,8 +13,6 @@ export const TYPE_SAVE_DATA = 'TYPE_SAVE_DATA'
 export const TYPE_KILL = 'TYPE_KILL'
 export const TYPE_SET_RANDOM_TIME = 'TYPE_SET_RANDOM_TIME'
 
-export const TYPE_SORT_DATA = 'TYPE_SORT_DATA'
-
 export const TYPE_SIGN_IN_USER = 'TYPE_SIGN_IN_USER'
 export const TYPE_SIGN_OUT_USER = 'TYPE_SIGN_OUT_USER'
 
