@@ -47,21 +47,80 @@ const styles = {
         marginLeft: '5px',
     },
     shareImg: {
-        height: '24px',
-        width: '24px',
+        height: '100%',
+        width: '100%',
         marginLeft: '-3px',
         marginTop: '-3px',
     },
     img: {
-        height: '24px',
-        width: '24px',
+        height: '100%',
+        width: '100%',
+        marginTop: '-3px',
+    },
+    button: {
+        backgroundColor: '#e8e8e8',
     },
 }
 
 const { Header } = Layout
 
+const renderLoginButton = (user, isAuthChanging, onSignInUser, onSignOutUser) => {
+    if (isAuthChanging) {
+        return <Spin size={'large'} />
+    }
+
+    if (user) {
+        return <Button 
+            style={styles.button}
+            size={'large'} 
+            shape={'circle'} 
+            icon={<img alt={''} src={LogoutSvg} width={styles.img.width} height={styles.img.height}/>} 
+            onClick={onSignOutUser} 
+        ></Button>
+    } else if (user === null) {
+        return <Button 
+            style={styles.button}
+            size={'large'} 
+            shape={'circle'} 
+            icon={<img alt={''} src={GoogleSvg} style={styles.img} width={styles.img.width} height={styles.img.height}/>} 
+            onClick={onSignInUser}
+        ></Button>
+    }
+}
+
+const renderShareButton = (disabled, text) => {
+    const content = (<strong>鏈接複製成功！</strong>)
+
+    let btn = <Button 
+        disabled={disabled} 
+        size={'large'} 
+        shape='circle' 
+        icon={<img alt={''} src={ShareSvg} style={styles.shareImg}/>}
+        style={styles.button}
+    ></Button>
+
+    if (disabled) {
+        return btn
+    }
+
+    return (
+        <CopyToClipboard text={text}>
+            <Popover trigger={'click'} content={content}>
+                {btn}
+            </Popover>
+        </CopyToClipboard>
+    )
+}
+
 const MainHeader = (props) => {
-    const { user, onSignInUser, onSignOutUser, onSetUser, isAuthChanging, onSetAuthChanging } = props
+    const { 
+        user, 
+        onSignInUser, 
+        onSignOutUser, 
+        onSetUser, 
+        isAuthChanging, 
+        onSetAuthChanging,
+    } = props
 
     useEffect(() => {
         onSetAuthChanging(true)
@@ -74,17 +133,6 @@ const MainHeader = (props) => {
 
     const history = useHistory()
 
-    const renderLoginButton = (user, isAuthChanging) => {
-        if (isAuthChanging) {
-            return <Spin size={'large'} />
-        }
-
-        if (user) {
-            return <Button size={'large'} shape={'circle'} icon={<img alt={''} src={LogoutSvg} width={styles.img.width} height={styles.img.height}/>} onClick={onSignOutUser} ></Button>
-        } else if (user === null) {
-            return <Button size={'large'} ghost shape={'circle'} icon={<img alt={''} src={GoogleSvg} width={styles.img.width} height={styles.img.height}/>} onClick={onSignInUser}></Button>
-        }
-    }
     const getShareText= userId => {
         let link = window.location.protocol
         link += `//${window.location.hostname}`
@@ -95,31 +143,6 @@ const MainHeader = (props) => {
         return link
     }
 
-    
-
-    const renderShareButton = ({ disabled, text }) => {
-        const content = (<strong>鏈接複製成功！</strong>)
-
-        let btn = <Button 
-            disabled={disabled} size={'large'} 
-            shape='circle' 
-            icon={<img alt={''} src={ShareSvg} 
-            style={styles.shareImg}/>}
-        ></Button>
-
-        if (disabled) {
-            return btn
-        }
-
-        return (
-            <CopyToClipboard text={text}>
-                <Popover trigger={'click'} content={content}>
-                    {btn}
-                </Popover>
-            </CopyToClipboard>
-        )
-    }
-
     return (
         <>
             <Header>
@@ -127,10 +150,10 @@ const MainHeader = (props) => {
                     {process.env.REACT_APP_VERSION} 
                 </div>
                 <div style={styles.login}>
-                    {renderLoginButton(user, isAuthChanging)}
+                    {renderLoginButton(user, isAuthChanging, onSignInUser, onSignOutUser)}
                 </div>
                 <div style={styles.share}>
-                    {renderShareButton({ disabled: !user, text: (user ? getShareText(user.uid) : null) })}
+                    {renderShareButton(!user, (user ? getShareText(user.uid) : null))}
                 </div>
                 <div style={styles.avatar}>
                     <Avatar 
