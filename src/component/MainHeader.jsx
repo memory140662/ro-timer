@@ -91,20 +91,21 @@ const MainHeader = (props) => {
         if (window.location.port) {
             link += `:${window.location.port}`
         }
-        link += `?id=${userId}`
+        link += `/?id=${userId}`
         return link
     }
 
     
 
     const renderShareButton = ({ disabled, text }) => {
-        const content = (
-            <div>
-                鏈接複製成功！
-            </div>
-        )
+        const content = (<strong>鏈接複製成功！</strong>)
 
-        let btn = <Button disabled={disabled} size={'large'} shape='circle' icon={<img alt={''} src={ShareSvg} style={styles.shareImg}/>}></Button>
+        let btn = <Button 
+            disabled={disabled} size={'large'} 
+            shape='circle' 
+            icon={<img alt={''} src={ShareSvg} 
+            style={styles.shareImg}/>}
+        ></Button>
 
         if (disabled) {
             return btn
