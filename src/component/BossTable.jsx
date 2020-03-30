@@ -160,7 +160,7 @@ function BossTable(props) {
 
     useEffect(() => {
       if (!tableHeight && tableRef && tableRef.current) {
-        setTableHeight(window.innerHeight - (tableRef.current.offsetTop + 50 + 10))
+        setTableHeight(window.innerHeight - (tableRef.current.offsetTop + 50 + 65))
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tableRef])
