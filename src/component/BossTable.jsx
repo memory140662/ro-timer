@@ -12,7 +12,7 @@ import {
 
 import { useLocation } from 'react-router-dom'
 
-import { Table, Button } from 'antd'
+import { Table, Button, message } from 'antd'
 import { DndProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 import { database } from '../common/api'
@@ -36,9 +36,12 @@ import {
   receiveBossAdded,
   receiveBossRemove,
   setRandomBoss,
+  applyMember,
+  checkMemberStatus,
+  setMemberStatus,
 } from '../common/actions'
 import ConfirmDialog from './ConfirmDialog'
-import { TIME_FORMAT } from '../common/constants'
+import { TIME_FORMAT, MEMBER_STATUS_PENDING, MEMBER_STATUS_APPLIED } from '../common/constants'
 
 const styles = {
   table: {
@@ -72,11 +75,52 @@ const styles = {
 
 const useQuery = () => (new URLSearchParams(useLocation().search))
 
+const renderSearchCol = (args) => {
+  const { memberStatus, isApplyLoading, search, setSearch, isEditable, onCreateDialogVisible, editApplyHandler, user } = args
+  const addButton = (
+    <EButton 
+      size={'large'}
+      icon={'plus'} 
+      onClick={onCreateDialogVisible}
+      style={styles.createButton}
+    >新增</EButton>
+  )
+
+  const applyButton = (
+    <EButton
+      disabled={memberStatus === undefined || memberStatus === MEMBER_STATUS_PENDING}
+      loading={isApplyLoading}
+      size={'large'}
+      icon={'information'}
+      style={styles.createButton}
+      onClick={() => editApplyHandler && editApplyHandler(user)}
+    >{memberStatus === MEMBER_STATUS_PENDING ? '審核中' : '編輯申請'}</EButton>
+  )
+
+  return (
+    <div>
+      <Input
+          value={search}
+          placeholder={'查詢'}
+          style={styles.search}
+          onChange={e => setSearch(e)}
+          icon={'close'}
+          trim
+          onIconClick={() => setSearch(null)}
+      />
+      {isEditable ?  addButton: applyButton}
+    </div>
+  )
+}
+
 function BossTable(props) {
     const { 
       data,
       user, 
       isLoading,
+      applyResult,
+      isApplyLoading,
+      memberStatus,
 
       onLoad,
       onEdit, 
@@ -89,10 +133,13 @@ function BossTable(props) {
       onReceiveBossAdded,
       onReceiveBossRemoved,
       onOpenRandomDialog,
+      onSetMemberStatus,
 
       onDeleteBoss, 
       onKillBoss, 
       onGetAllBoss,
+      onApplyMember,
+      onCheckMemberStatus,
     } = props
     const tableRef = useRef()
     const [tableHeight, setTableHeight] = useState(0)
@@ -106,8 +153,24 @@ function BossTable(props) {
       let bossChangedRef = null
       let bossAddedRef = null
       let bossRemovedRef = null
+      let memberStatusRef = null
       if (id) {
-        onGetAllBoss(id)
+        if (!user) {
+          onGetAllBoss(id)
+        } else {
+          onCheckMemberStatus(id, user.uid)
+          if (!memberStatusRef) {
+            memberStatusRef = database.ref(`/users/${id}/members/${user.uid}`)
+            memberStatusRef.on('value', snapshot => {
+              if (snapshot.exists()) {
+                const val = snapshot.child('status').val()
+                onSetMemberStatus(val)
+              } else {
+                onSetMemberStatus('')
+              }
+            })
+          }
+        }
         if (!bossChangedRef) {
           bossChangedRef = database.ref(`/users/${id}/bosses`)
           bossChangedRef.on('child_changed', snapshot => {
@@ -147,6 +210,9 @@ function BossTable(props) {
         if (bossRemovedRef) {
           bossRemovedRef.off('child_removed')
         }
+        if (memberStatusRef) {
+          memberStatusRef.off('child_changed')
+        }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, id])
@@ -165,6 +231,17 @@ function BossTable(props) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tableRef])
 
+    useEffect(() => {
+      if (applyResult) {
+        if (applyResult instanceof Error) {
+          message.error('申請提交中！請勿重複申請。')
+        } else {
+          message.success('申請已提交，待審核中。')
+        }
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [applyResult])
+
     const deleteHandler = (uid, bossKey) => {
       if (uid) {
         onDeleteBoss(uid, bossKey)
@@ -181,9 +258,26 @@ function BossTable(props) {
       }
     }
 
+    const editApplyHandler = (user) => {
+      if (!user) {
+        message.error('請先登入！')
+        return
+      }
+      if (user.uid === id) {
+        message.error('使用者與申請者不能為同一人!')
+        return
+      }
+
+      if (memberStatus === MEMBER_STATUS_PENDING) {
+        message.error('申請提交中！請勿重複申請。')
+        return
+      }
+
+      onApplyMember(id, user)
+    }
     const column = text => <span style={styles.column}>{text}</span>
 
-    const isEditable = !id || (user && user.uid === id)
+    const isEditable = (!id || (user && user.uid === id)) || memberStatus === MEMBER_STATUS_APPLIED
 
     return (
         <>
@@ -192,22 +286,16 @@ function BossTable(props) {
                 background: #f5f5f5;
               }
           `}</style>
-          <div>
-            <Input
-                value={search}
-                placeholder={'查詢'}
-                style={styles.search}
-                onChange={e => setSearch(e)}
-                icon={'close'}
-                trim
-                onIconClick={() => setSearch(null)}
-            />
-            {isEditable ? <EButton 
-              size={'large'}
-              icon={'plus'} 
-              onClick={onCreateDialogVisible}
-              style={styles.createButton}>新增</EButton> : null}
-          </div>
+          {renderSearchCol({
+            memberStatus,
+            isApplyLoading,
+            search, 
+            setSearch, 
+            isEditable, 
+            onCreateDialogVisible, 
+            editApplyHandler,
+            user,
+          })}
           <div style={styles.tableOutside} ref={tableRef}>
             <DndProvider backend={HTML5Backend}>
               <Table
@@ -294,21 +382,26 @@ BossTable.propTypes = {
     data: PropTypes.array.isRequired,
     user: PropTypes.object,
     isLoading: PropTypes.bool.isRequired,
+    applyResult: PropTypes.any,
+    isApplyLoading: PropTypes.bool,
+    memberStatus: PropTypes.string,
 
     onLoad: PropTypes.func.isRequired,
     onEdit: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
     onKill: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
-    
     onCheckLocal: PropTypes.func.isRequired,
     onCreateDialogVisible: PropTypes.func.isRequired,
     onReceiveBossChanged: PropTypes.func.isRequired,
     onOpenRandomDialog: PropTypes.func.isRequired,
+    onSetMemberStatus: PropTypes.func.isRequired,
     
     onDeleteBoss: PropTypes.func.isRequired,
     onKillBoss: PropTypes.func.isRequired,
     onGetAllBoss: PropTypes.func.isRequired,
+    onApplyMember: PropTypes.func.isRequired,
+    onCheckMemberStatus: PropTypes.func.isRequired,
 }
 
 const mapState2Props = state => ({
@@ -316,6 +409,9 @@ const mapState2Props = state => ({
     user: state.user,
     isLoading: state.isLoading,
     currentBoss: state.currentBoss,
+    applyResult: state.applyResult,
+    isApplyLoading: state.isApplyLoading,
+    memberStatus: state.memberStatus,
 })
 
 const mapDispatch2Props = dispatch => ({
@@ -329,12 +425,14 @@ const mapDispatch2Props = dispatch => ({
     onReceiveBossChanged: boss => dispatch(receiveBossChanged(boss)),
     onReceiveBossAdded: boss => dispatch(receiveBossAdded(boss)),
     onReceiveBossRemoved: boss => dispatch(receiveBossRemove(boss)),
-    onOpenRandomDialog: (boss) => dispatch(setRandomBoss(boss)),
+    onOpenRandomDialog: boss => dispatch(setRandomBoss(boss)),
+    onSetMemberStatus: status => dispatch(setMemberStatus(status)),
     
     onDeleteBoss: (userId, bossKey)=> dispatch(deleteBoss(userId, bossKey)),
     onKillBoss: (userId, bossKey) => dispatch(killBoss(userId, bossKey)),
     onGetAllBoss: (userId) => dispatch(getAllBoss(userId)),
-    
+    onApplyMember: (userId, applyUser) => dispatch(applyMember(userId, applyUser)),
+    onCheckMemberStatus: (userId, applyUserId) => dispatch(checkMemberStatus(userId, applyUserId)),
 })
 
 export default connect(mapState2Props, mapDispatch2Props)(BossTable)

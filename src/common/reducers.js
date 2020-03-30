@@ -20,6 +20,11 @@ const initState = {
     isAuthChanging: false,
     isCreateDialogVisible: false,
     error: null,
+    applyResult: null,
+    isApplyLoading: false,
+    members: [],
+    isMemberLoading: false,
+    memberStatus: undefined,
 }
 
 const createHandler = (state, payload) => {
@@ -231,16 +236,125 @@ const receiveBossRemovedHandler = (state, payload) => {
     })
 }
 
-const setRandomBoss = (state, payload) => {
+const setRandomBossHandler = (state, payload) => {
 
     return update(state, {
         randomBoss: { $set: payload },
     })
 }
 
-const setCreateDialogVisible = (state, payload) => {
+const setCreateDialogVisibleHandler = (state, payload) => {
     return update(state, {
         isCreateDialogVisible: { $set: payload },
+    })
+}
+
+const applyMemberPendingHandler = (state) => {
+    return update(state, {
+        isApplyLoading: { $set: true },
+        applyResult: { $set: null },
+    })
+}
+
+const applyMemberHandler = (state, payload, error) => {
+    if (error) {
+        return update(state, {
+            isApplyLoading: { $set: false },
+            applyResult: { $set: error },
+        })
+    }
+
+    return update(state, {
+        isApplyLoading: { $set: false },
+        applyResult: { $set: payload },
+    })
+}
+
+const getMemberHandler = (state, payload, error) => {
+    if (!payload && !error) {
+        return update(state, {
+            isMemberLoading: { $set: true },
+        })
+    }
+    if (error) {
+        return update(state, {
+            isMemberLoading: { $set: false },
+            error: { $set: error },
+        })
+    }
+
+    return update(state, {
+        isMemberLoading: { $set: false },
+        members: { $set: payload },
+    })
+}
+
+const checkMemberStatusHandler = (state, payload, error) => {
+    if (error) {
+        return update(state, {
+            error: { $set: error },
+        })
+    }
+
+    return setMemberStatusHandler(state, payload)
+}
+
+const setMemberStatusHandler = (state, payload) => {
+    return update(state, {
+        memberStatus: { $set: payload },
+    })
+}
+
+const updateMemberStatusHandler = (state, payload, error) => {
+    if (!error && !payload) {
+        return update(state, {
+            isMemberLoading: { $set: true },
+        })
+    }
+
+    if (error) {
+        return update(state, {
+            error: { $set: error },
+            isMemberLoading: { $set: false },
+        })
+    }
+
+    const idx = state.members.findIndex(member => member.uid === payload.uid)
+    return update(state, {
+        members: { $splice: [[idx, 1, payload]] },
+        isMemberLoading: { $set: false },
+    })
+}
+
+const removeMemberHandler = (state, payload, error) => {
+    if (!error && !payload) {
+        return update(state, {
+            isMemberLoading: { $set: true },
+        })
+    }
+
+    if (error) {
+        return update(state, {
+            error: { $set: error },
+            isMemberLoading: { $set: false },
+        })
+    }
+
+    const idx = state.members.findIndex(member => member.uid === payload)
+    return update(state, {
+        members: { $splice: [[idx, 1]] },
+        isMemberLoading: { $set: false },
+    })
+}
+
+const receiveMemberApplyHandler = (state, payload) => {
+    const idx = state.members.findIndex(member => member.uid === payload.uid)
+    if (idx !== -1) {
+        return state
+    }
+
+    return update(state, {
+        members: { $push: [payload] },
     })
 }
 
@@ -262,8 +376,10 @@ export default handleActions({
     [types.TYPE_RECEIVE_BOSS_CHANGED]: (state, { payload }) => receiveBossChangedHandler(state, payload),
     [types.TYPE_RECEIVE_BOSS_ADDED]: (state, { payload }) => receiveBossAddedHandler(state, payload),
     [types.TYPE_RECEIVE_BOSS_REMOVED]: (state, { payload }) => receiveBossRemovedHandler(state, payload),
-    [types.TYPE_SET_RANDOM_BOSS]: (state, { payload }) => setRandomBoss(state, payload),
-    [types.TYPE_SET_CREATE_DIALOG_VISIBLE]: (state, { payload }) => setCreateDialogVisible(state, payload),
+    [types.TYPE_SET_RANDOM_BOSS]: (state, { payload }) => setRandomBossHandler(state, payload),
+    [types.TYPE_SET_CREATE_DIALOG_VISIBLE]: (state, { payload }) => setCreateDialogVisibleHandler(state, payload),
+    [types.TYPE_SET_MEMBER_STATUS]: (state, { payload }) => setMemberStatusHandler(state, payload),
+    [types.TYPE_RECEIVE_MEMBER_APPLY]: (state, { payload }) => receiveMemberApplyHandler(state, payload),
     // pending
     [asyncPending(types.TYPE_SIGN_IN_USER)]: (state) => pendingHandler(state),
     [asyncPending(types.TYPE_SIGN_OUT_USER)]: (state) => pendingHandler(state),
@@ -274,6 +390,10 @@ export default handleActions({
     [asyncPending(types.TYPE_SET_BOSS_RANDOM_TIME)]: (state) => pendingHandler(state),
     [asyncPending(types.TYPE_UPLOAD_LOCAL_TO_CLOUD)]: (state) => pendingHandler(state),
     [asyncPending(types.TYPE_DELETE_BOSS)]: (state) => pendingHandler(state),
+    [asyncPending(types.TYPE_APPLY_MEMBER)]: (state) => applyMemberPendingHandler(state),
+    [asyncPending(types.TYPE_GET_MEMBERS)]: (state) => getMemberHandler(state),
+    [asyncPending(types.TYPE_UPDATE_MEMBER_STATUS)]: (state) => updateMemberStatusHandler(state),
+    [asyncPending(types.TYPE_REMOVE_MEMBER)]: (state) => removeMemberHandler(state),
     // fulfilled
     [asyncFulfilled(types.TYPE_GET_ALL_BOSS)]: (state, { payload }) => getAllBossHandler(state, payload),
     [asyncFulfilled(types.TYPE_CREATE_BOSS)]: (state, { payload }) => createBossHandler(state, payload),
@@ -282,6 +402,11 @@ export default handleActions({
     [asyncFulfilled(types.TYPE_SET_BOSS_RANDOM_TIME)]: (state, { payload }) => updateBossHandler(state, payload),
     [asyncFulfilled(types.TYPE_UPLOAD_LOCAL_TO_CLOUD)]: (state, { payload }) => upload2CloudHandler(state, payload),
     [asyncFulfilled(types.TYPE_DELETE_BOSS)]: (state, { payload }) => deleteBossHandler(state, payload),
+    [asyncFulfilled(types.TYPE_APPLY_MEMBER)]: (state, { payload }) => applyMemberHandler(state, payload),
+    [asyncFulfilled(types.TYPE_GET_MEMBERS)]: (state, { payload }) => getMemberHandler(state, payload),
+    [asyncFulfilled(types.TYPE_CHECK_MEMBER_STATUS)]: (state, { payload }) => checkMemberStatusHandler(state, payload),
+    [asyncFulfilled(types.TYPE_UPDATE_MEMBER_STATUS)]: (state, { payload }) => updateMemberStatusHandler(state, payload),
+    [asyncFulfilled(types.TYPE_REMOVE_MEMBER)]: (state, { payload }) => removeMemberHandler(state, payload),
     // rejected
     [asyncRejected(types.TYPE_GET_ALL_BOSS)]: (state, { payload }) => rejectedHandler(state, payload),
     [asyncRejected(types.TYPE_CREATE_BOSS)]: (state, { payload }) => rejectedHandler(state, payload),
@@ -290,4 +415,9 @@ export default handleActions({
     [asyncRejected(types.TYPE_SET_BOSS_RANDOM_TIME)]: (state, { payload }) => rejectedHandler(state, payload),
     [asyncRejected(types.TYPE_UPLOAD_LOCAL_TO_CLOUD)]: (state, { payload }) => rejectedHandler(state, payload),
     [asyncRejected(types.TYPE_DELETE_BOSS)]: (state, { payload }) => rejectedHandler(state, payload),
+    [asyncRejected(types.TYPE_APPLY_MEMBER)]: (state, { payload }) => applyMemberHandler(state, null, payload),
+    [asyncRejected(types.TYPE_GET_MEMBERS)]: (state, { payload }) => getMemberHandler(state, null, payload),
+    [asyncRejected(types.TYPE_CHECK_MEMBER_STATUS)]: (state, { payload }) => checkMemberStatusHandler(state, null, payload),
+    [asyncRejected(types.TYPE_UPDATE_MEMBER_STATUS)]: (state, { payload }) => updateMemberStatusHandler(state, null, payload),
+    [asyncRejected(types.TYPE_REMOVE_MEMBER)]: (state, { payload }) => removeMemberHandler(state, null, payload),
 }, initState)

@@ -7,6 +7,7 @@ import {
 } from 'antd'
 
 import BossTable from './BossTable'
+import MemberTable from './MemberTable'
 import asyncComponent from '../hoc/asyncComponent'
 
 const { Content } = Layout
@@ -27,8 +28,7 @@ const MainContent = () => {
         <Content style={styles.content}>
             <Row gutter={16}>
                 <Col xs={24} sm={24} md={24} lg={20} xl={16} xxl={16}><BossTable /></Col>
-                <Col xs={0} sm={0} md={0} lg={0} xl={8} xxl={4}>
-                </Col>
+                <Col xs={0} sm={0} md={0} lg={0} xl={8} xxl={4}><MemberTable/></Col>
             </Row>
             <CreateBossDialog />
             <Local2CloudDialog />

@@ -6,6 +6,7 @@ import upload from 'immutability-helper'
 
 
 import Service from './service'
+import { MEMBER_STATUS_PENDING } from './constants'
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -110,4 +111,56 @@ export const updateToCloud = async (userId, data) => {
     await database.ref(path).remove()
     await database.ref(path).update(file)
     return res
+}
+
+export const applyMember = async (userId, member) => {
+    const path = `/users/${userId}/members`
+    const data = {
+        uid: member.uid,
+        displayName: member.displayName,
+        photoURL: member.photoURL,
+        status: MEMBER_STATUS_PENDING,
+    }
+    await database.ref(path).child(member.uid).set(data)
+    return data
+}
+
+export const getMembers = async (userId) => {
+    const path = `/users/${userId}/members`
+    const snapshot = await database.ref(path).once('value')
+    const out = []
+    snapshot.forEach(childSnapshot => {
+        out.push(childSnapshot.val())
+    })
+    return out   
+}
+
+export const checkMemberStatus = async (userId, memberId) => {
+    const path = `/users/${userId}/members/${memberId}`
+    const snapshot = await database.ref(path).once('value')
+    if (snapshot.exists()) {
+        return snapshot.child('status').val()
+    }
+
+    return ''
+}
+
+export const updateMemberStatus = async (userId, memberId, status) => {
+    const path = `/users/${userId}/members/${memberId}`
+    const snapshot = await database.ref(path).once('value')
+    if (snapshot.exists()) {
+        const val = snapshot.val()
+        const data = upload(val, {
+            status: { $set: status },
+        })
+        await database.ref(path).update(data)
+        return data
+    }
+    return null
+}
+
+export const removeMember = async (userId, memberId) => {
+    const path = `/users/${userId}/members/${memberId}`
+    await database.ref(path).remove()
+    return memberId
 }

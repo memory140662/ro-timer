@@ -4,3 +4,7 @@ export const TIME_NUM_FORMAT = 'HHmm'
 export const TIME_NUM_FORMAT2 = 'Hmm'
 export const TIME_NUM_FORMAT3 = 'HH'
 export const TIME_NUM_FORMAT4 = 'H'
+
+export const MEMBER_STATUS_PENDING = 'PENDING'
+export const MEMBER_STATUS_APPLIED = 'APPLIED'
+export const MEMBER_STATUS_REJECTED = 'REJECTED'
