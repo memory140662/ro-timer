@@ -14,7 +14,7 @@ import { TIME_FORMAT } from '../common/constants'
 
 import {
     editCancel,
-    editConfirm,
+    update,
     updateBoss,
 } from '../common/actions'
 
@@ -120,7 +120,7 @@ const mapState2Props = state => ({
 
 const mapDispatch2Props = dispatch => ({
     onCancel: () => dispatch(editCancel()),
-    onEditConfirm: (data) => dispatch(editConfirm(data)),
+    onEditConfirm: (data) => dispatch(update(data)),
     onUpdateBoss: (userId, bossKey, data) => dispatch(updateBoss(userId, bossKey, data)),
 })
 

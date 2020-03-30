@@ -3,7 +3,7 @@ export const TYPE_CREATE_EDIT = 'TYPE_CREATE_EDIT'
 
 export const TYPE_EDIT = 'TYPE_EDIT'
 export const TYPE_EDIT_CANCEL = 'TYPE_EDIT_CANCEL'
-export const TYPE_EDIT_CONFIRM = 'TYPE_EDIT_CONFIRM'
+export const TYPE_UPDATE = 'TYPE_UPDATE'
 
 export const TYPE_DELETE = 'TYPE_DELETE'
 

@@ -12,7 +12,7 @@ import {
 
 import { useLocation } from 'react-router-dom'
 
-import { Table, Button, message } from 'antd'
+import { Table, Button, message, Modal } from 'antd'
 import { DndProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 import { database } from '../common/api'
@@ -39,9 +39,11 @@ import {
   applyMember,
   checkMemberStatus,
   setMemberStatus,
+  update,
+  updateBoss,
 } from '../common/actions'
-import ConfirmDialog from './ConfirmDialog'
 import { TIME_FORMAT, MEMBER_STATUS_PENDING, MEMBER_STATUS_APPLIED } from '../common/constants'
+import { ExclamationCircleOutlined } from '@ant-design/icons'
 
 const styles = {
   table: {
@@ -71,12 +73,15 @@ const styles = {
   confirmDialogMessage: {
     fontSize: '14px',
   },
+  deleteDialog: { 
+    color: 'red',
+  },
 }
 
 const useQuery = () => (new URLSearchParams(useLocation().search))
 
 const renderSearchCol = (args) => {
-  const { memberStatus, isApplyLoading, search, setSearch, isEditable, onCreateDialogVisible, editApplyHandler, user } = args
+  const { memberStatus, isApplyLoading, search, setSearch, isEditable, onCreateDialogVisible, editApplyHandler, user, isMemberStatusChecking } = args
   const addButton = (
     <EButton 
       size={'large'}
@@ -88,7 +93,7 @@ const renderSearchCol = (args) => {
 
   const applyButton = (
     <EButton
-      disabled={memberStatus === undefined || memberStatus === MEMBER_STATUS_PENDING}
+      disabled={isMemberStatusChecking || memberStatus === MEMBER_STATUS_PENDING}
       loading={isApplyLoading}
       size={'large'}
       icon={'information'}
@@ -121,6 +126,7 @@ function BossTable(props) {
       applyResult,
       isApplyLoading,
       memberStatus,
+      isMemberStatusChecking,
 
       onLoad,
       onEdit, 
@@ -134,17 +140,18 @@ function BossTable(props) {
       onReceiveBossRemoved,
       onOpenRandomDialog,
       onSetMemberStatus,
+      onClear,
 
       onDeleteBoss, 
       onKillBoss, 
       onGetAllBoss,
       onApplyMember,
       onCheckMemberStatus,
+      onClearBoss,
     } = props
     const tableRef = useRef()
     const [tableHeight, setTableHeight] = useState(0)
     const [search, setSearch] = useState(null)
-    const [deleteBoss, setDeleteBoss] = useState(null)
 
     const query = useQuery()
     const id = query.get('id')
@@ -218,7 +225,7 @@ function BossTable(props) {
     }, [user, id])
     
     useEffect(() => {
-      if (!id && !user && data && data.length > 0) {
+      if (!id && !user) {
         onSave()
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -242,12 +249,23 @@ function BossTable(props) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [applyResult])
 
-    const deleteHandler = (uid, bossKey) => {
-      if (uid) {
-        onDeleteBoss(uid, bossKey)
-      } else {
-        onDelete(bossKey)
-      }
+    const deleteHandler = (uid, boss) => {
+      Modal.confirm({
+        title: '刪除確認！',
+        icon: <ExclamationCircleOutlined style={styles.deleteDialog} />,
+        content: `是否刪除 ${boss.name} ？`,
+        okText: '刪除',
+        cancelText: '取消',
+        okType:'danger',
+        onOk() {
+          if (uid) {
+            onDeleteBoss(uid, boss.key)
+          } else {
+            onDelete(boss.key)
+          }
+        },
+      })
+      
     }
 
     const killHandler = (uid, bossKey) => {
@@ -275,6 +293,24 @@ function BossTable(props) {
 
       onApplyMember(id, user)
     }
+
+    const clearHandler = (uid, boss) => {
+      Modal.confirm({
+        title: '清除確認！',
+        icon: <ExclamationCircleOutlined />,
+        content: `是否清除 ${boss.name} 擊殺時間及重生時間？`,
+        okText: '清除',
+        cancelText: '取消',
+        onOk() {
+          if (uid) {
+            onClearBoss(uid, boss.key)
+          } else {
+            onClear(boss.key)
+          }
+        },
+      })
+    }
+
     const column = text => <span style={styles.column}>{text}</span>
 
     const isEditable = (!id || (user && user.uid === id)) || memberStatus === MEMBER_STATUS_APPLIED
@@ -295,6 +331,7 @@ function BossTable(props) {
             onCreateDialogVisible, 
             editApplyHandler,
             user,
+            isMemberStatusChecking,
           })}
           <div style={styles.tableOutside} ref={tableRef}>
             <DndProvider backend={HTML5Backend}>
@@ -354,25 +391,15 @@ function BossTable(props) {
                 <Table.Column title={'操作'} dataIndex={'opt'} key={'opt'} width={320} render={(_, data) => (
                   isEditable ? 
                   <>
-                    <EButton icon={'check'} type={'success'} onClick={() => killHandler(user && user.uid, data.key)}>擊殺</EButton>
-                    <EButton icon={'edit'} type={'info'} onClick={() => onEdit(data.key)}>編輯</EButton>
-                    <EButton icon={'delete'} type={'danger'} onClick={() => setDeleteBoss(data)}>刪除</EButton>
+                    <EButton size={'small'} icon={'check'} type={'success'} onClick={() => killHandler(user && user.uid, data.key)}>擊殺</EButton>
+                    <EButton size={'small'} icon={'edit'} type={'info'} onClick={() => onEdit(data.key)}>編輯</EButton>
+                    <EButton size={'small'} icon={'delete'} type={'danger'} onClick={() => deleteHandler(user && user.uid, data)}>刪除</EButton>
+                    <EButton size={'small'} icon={'close'} onClick={() => clearHandler(user && user.uid, data)}>清除</EButton>
                   </>
                   : null
                 )}/>
               </Table>
             </DndProvider>
-            <ConfirmDialog 
-              title={deleteBoss ? deleteBoss.name : null}
-              visible={!!deleteBoss}
-              message={() => (
-                <div style={styles.confirmDialogMessage}>
-                  是否刪除 <strong>{deleteBoss ? deleteBoss.name : null}</strong> ?
-                </div>
-              )} 
-              onCancel={() => setDeleteBoss(null)}
-              onConfirm={() => deleteHandler(user && user.uid, deleteBoss.key)}
-            />
           </div>
         </>
     )
@@ -385,6 +412,7 @@ BossTable.propTypes = {
     applyResult: PropTypes.any,
     isApplyLoading: PropTypes.bool,
     memberStatus: PropTypes.string,
+    isMemberStatusChecking: PropTypes.bool,
 
     onLoad: PropTypes.func.isRequired,
     onEdit: PropTypes.func.isRequired,
@@ -396,12 +424,14 @@ BossTable.propTypes = {
     onReceiveBossChanged: PropTypes.func.isRequired,
     onOpenRandomDialog: PropTypes.func.isRequired,
     onSetMemberStatus: PropTypes.func.isRequired,
+    onClear: PropTypes.func.isRequired,
     
     onDeleteBoss: PropTypes.func.isRequired,
     onKillBoss: PropTypes.func.isRequired,
     onGetAllBoss: PropTypes.func.isRequired,
     onApplyMember: PropTypes.func.isRequired,
     onCheckMemberStatus: PropTypes.func.isRequired,
+    onClearBoss: PropTypes.func.isRequired,
 }
 
 const mapState2Props = state => ({
@@ -412,6 +442,7 @@ const mapState2Props = state => ({
     applyResult: state.applyResult,
     isApplyLoading: state.isApplyLoading,
     memberStatus: state.memberStatus,
+    isMemberStatusChecking: state.isMemberStatusChecking,
 })
 
 const mapDispatch2Props = dispatch => ({
@@ -427,12 +458,14 @@ const mapDispatch2Props = dispatch => ({
     onReceiveBossRemoved: boss => dispatch(receiveBossRemove(boss)),
     onOpenRandomDialog: boss => dispatch(setRandomBoss(boss)),
     onSetMemberStatus: status => dispatch(setMemberStatus(status)),
+    onClear: key => dispatch(update({key, dealTime: null })),
     
     onDeleteBoss: (userId, bossKey)=> dispatch(deleteBoss(userId, bossKey)),
     onKillBoss: (userId, bossKey) => dispatch(killBoss(userId, bossKey)),
     onGetAllBoss: (userId) => dispatch(getAllBoss(userId)),
     onApplyMember: (userId, applyUser) => dispatch(applyMember(userId, applyUser)),
     onCheckMemberStatus: (userId, applyUserId) => dispatch(checkMemberStatus(userId, applyUserId)),
+    onClearBoss: (userId, bossKey) => dispatch(updateBoss(userId, bossKey, { dealTime: null })),
 })
 
 export default connect(mapState2Props, mapDispatch2Props)(BossTable)

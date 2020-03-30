@@ -25,6 +25,7 @@ const initState = {
     members: [],
     isMemberLoading: false,
     memberStatus: undefined,
+    isMemberStatusChecking: false,
 }
 
 const createHandler = (state, payload) => {
@@ -132,7 +133,7 @@ const setRandomTime = (state, payload) => {
     })
 }
 
-const editConfirmHandler = (state, payload) => {
+const updateHandler = (state, payload) => {
     const index = state.data.findIndex(boss => boss.key === payload.key)
     if (index === -1) {
         return state
@@ -290,9 +291,15 @@ const getMemberHandler = (state, payload, error) => {
 }
 
 const checkMemberStatusHandler = (state, payload, error) => {
+    if (!payload && !error) {
+        return update(state, {
+            isMemberStatusChecking: { $set: true },
+        })
+    }
     if (error) {
         return update(state, {
             error: { $set: error },
+            isMemberStatusChecking: { $set: false },
         })
     }
 
@@ -302,6 +309,7 @@ const checkMemberStatusHandler = (state, payload, error) => {
 const setMemberStatusHandler = (state, payload) => {
     return update(state, {
         memberStatus: { $set: payload },
+        isMemberStatusChecking: { $set: false },
     })
 }
 
@@ -365,7 +373,7 @@ export default handleActions({
     [types.TYPE_SET_RANDOM_TIME]: (state, { payload }) => setRandomTime(state, payload),
     [types.TYPE_EDIT]: (state, { payload }) => editHandler(state, payload),
     [types.TYPE_EDIT_CANCEL]: state => editCancelHandler(state),
-    [types.TYPE_EDIT_CONFIRM]: (state, { payload }) => editConfirmHandler(state, payload),
+    [types.TYPE_UPDATE]: (state, { payload }) => updateHandler(state, payload),
     [types.TYPE_SAVE_DATA]: state => saveHandler(state),
     [types.TYPE_DELETE]: (state, { payload }) => deleteBossHandler(state, payload),
     [types.TYPE_SET_USER]: (state, { payload }) => setUserHandler(state, payload),
@@ -394,6 +402,7 @@ export default handleActions({
     [asyncPending(types.TYPE_GET_MEMBERS)]: (state) => getMemberHandler(state),
     [asyncPending(types.TYPE_UPDATE_MEMBER_STATUS)]: (state) => updateMemberStatusHandler(state),
     [asyncPending(types.TYPE_REMOVE_MEMBER)]: (state) => removeMemberHandler(state),
+    [asyncPending(types.TYPE_CHECK_MEMBER_STATUS)]: (state) => checkMemberStatusHandler(state),
     // fulfilled
     [asyncFulfilled(types.TYPE_GET_ALL_BOSS)]: (state, { payload }) => getAllBossHandler(state, payload),
     [asyncFulfilled(types.TYPE_CREATE_BOSS)]: (state, { payload }) => createBossHandler(state, payload),

@@ -123,7 +123,7 @@ const MemberTable = (props) => {
 
     return (
         <div style={styles.table} >
-            <h4>成員</h4>
+            <h4>編輯成員</h4>
             <Table 
                 dataSource={members}
                 loading={isMemberLoading}
