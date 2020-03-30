@@ -44,7 +44,7 @@ import { TIME_FORMAT } from '../common/constants'
 
 const styles = {
   table: {
-    width: 900,
+    alignSelf: 'center',
   },
   search: {
     width: 350,
@@ -251,7 +251,7 @@ function BossTable(props) {
                 background: #f5f5f5;
               }
           `}</style>
-          <div style={styles.table}>
+          <div>
             <Input
                 value={search}
                 placeholder={'查詢'}
