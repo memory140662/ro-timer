@@ -4,11 +4,13 @@ import {
     Layout,
     Row,
     Col,
+    Spin,
 } from 'antd'
 
 import BossTable from './BossTable'
 import MemberTable from './MemberTable'
 import asyncComponent from '../hoc/asyncComponent'
+import { connect } from 'react-redux'
 
 const { Content } = Layout
 
@@ -23,19 +25,27 @@ const styles = {
     },
 }
 
-const MainContent = () => {
+const MainContent = (props) => {
+    const { isConfigLoading } = props
+    
     return (
-        <Content style={styles.content}>
-            <Row gutter={16}>
-                <Col xs={24} sm={24} md={24} lg={20} xl={16} xxl={16}><BossTable /></Col>
-                <Col xs={0} sm={0} md={0} lg={0} xl={8} xxl={4}><MemberTable/></Col>
-            </Row>
-            <CreateBossDialog />
-            <Local2CloudDialog />
-            <EditBossDialog /> 
-            <RandomDialog /> 
-        </Content>
+        <Spin size={'large'} spinning={isConfigLoading}>
+            <Content style={styles.content}>
+                <Row gutter={16}>
+                    <Col xs={24} sm={24} md={24} lg={20} xl={16} xxl={16}><BossTable /></Col>
+                    <Col xs={0} sm={0} md={0} lg={0} xl={8} xxl={4}><MemberTable/></Col>
+                </Row>
+                <CreateBossDialog />
+                <Local2CloudDialog />
+                <EditBossDialog /> 
+                <RandomDialog /> 
+            </Content>
+        </Spin>
     )
 }
 
-export default MainContent
+const mapState2Props = state => ({
+    isConfigLoading: state.isConfigLoading,
+})
+
+export default connect(mapState2Props)(MainContent)

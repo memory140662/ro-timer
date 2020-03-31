@@ -26,6 +26,8 @@ const initState = {
     isMemberLoading: false,
     memberStatus: undefined,
     isMemberStatusChecking: false,
+    maxRandomNum: 0,
+    isConfigLoading: false,
 }
 
 const createHandler = (state, payload) => {
@@ -367,6 +369,20 @@ const receiveMemberApplyHandler = (state, payload) => {
     })
 }
 
+const loadRemoteConfigPendingHandler = (state) => {
+    return update(state, {
+        isConfigLoading: { $set: true },
+    })
+}
+
+const loadRemoteConfigHandler = (state, payload) => {
+    return {
+        ...state,
+        ...payload,
+        isConfigLoading: false,
+    }
+}
+
 export default handleActions({
     [types.TYPE_CREATE]: (state, { payload }) => createHandler(state, payload),
     [types.TYPE_LOAD_DATA]: (state) => loadHandler(state),
@@ -404,6 +420,7 @@ export default handleActions({
     [asyncPending(types.TYPE_UPDATE_MEMBER_STATUS)]: (state) => updateMemberStatusHandler(state),
     [asyncPending(types.TYPE_REMOVE_MEMBER)]: (state) => removeMemberHandler(state),
     [asyncPending(types.TYPE_CHECK_MEMBER_STATUS)]: (state) => checkMemberStatusPendingHandler(state),
+    [asyncPending(types.TYPE_LOAD_REMOTE_CONFIG)]: (state) => loadRemoteConfigPendingHandler(state),
     // fulfilled
     [asyncFulfilled(types.TYPE_GET_ALL_BOSS)]: (state, { payload }) => getAllBossHandler(state, payload),
     [asyncFulfilled(types.TYPE_CREATE_BOSS)]: (state, { payload }) => createBossHandler(state, payload),
@@ -417,6 +434,7 @@ export default handleActions({
     [asyncFulfilled(types.TYPE_CHECK_MEMBER_STATUS)]: (state, { payload }) => checkMemberStatusHandler(state, payload),
     [asyncFulfilled(types.TYPE_UPDATE_MEMBER_STATUS)]: (state, { payload }) => updateMemberStatusHandler(state, payload),
     [asyncFulfilled(types.TYPE_REMOVE_MEMBER)]: (state, { payload }) => removeMemberHandler(state, payload),
+    [asyncFulfilled(types.TYPE_LOAD_REMOTE_CONFIG)]: (state, { payload }) => loadRemoteConfigHandler(state, payload),
     // rejected
     [asyncRejected(types.TYPE_GET_ALL_BOSS)]: (state, { payload }) => rejectedHandler(state, payload),
     [asyncRejected(types.TYPE_CREATE_BOSS)]: (state, { payload }) => rejectedHandler(state, payload),

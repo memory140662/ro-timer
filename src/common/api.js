@@ -1,6 +1,8 @@
 import * as firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/database'
+import 'firebase/analytics'
+import 'firebase/remote-config'
 
 import upload from 'immutability-helper'
 
@@ -16,11 +18,15 @@ const firebaseConfig = {
     storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
     messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
     appId: process.env.REACT_APP_FIREBASE_APP_ID,
+    measurementId: 'G-E922PZY97X',
 }
 
 firebase.initializeApp(firebaseConfig)
+firebase.analytics()
+
 export const auth = firebase.auth()
 export const database = firebase.database()
+export const remoteConfig = firebase.remoteConfig()
 
 export const signInUser = async () => {
     const provider = new firebase.auth.GoogleAuthProvider()
@@ -163,4 +169,24 @@ export const removeMember = async (userId, memberId) => {
     const path = `/users/${userId}/members/${memberId}`
     await database.ref(path).remove()
     return memberId
+}
+
+export const loadRemoteConfig = async () => {
+    remoteConfig.settings = {
+        minimumFetchIntervalMillis: 3600000,
+    }
+
+    remoteConfig.defaultConfig = ({
+        maxRandomNum: 30,
+    })
+
+    try {
+        await remoteConfig.fetchAndActivate()
+    } catch (e) {
+
+    }
+    
+    return {
+        maxRandomNum: remoteConfig.getNumber('maxRandomNum'),
+    }
 }

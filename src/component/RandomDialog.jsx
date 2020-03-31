@@ -16,9 +16,9 @@ import {
 import { useLocation } from 'react-router-dom'
 const useQuery = () => (new URLSearchParams(useLocation().search))
 
-const renderButton = (choiceNum, onChoice, onCancel) => {
+const renderButton = (choiceNum, onChoice, onCancel, maxRandomNum) => {
     const buttons = []
-    for (let i = 0; i <= 20; i++) {
+    for (let i = 0; i <= maxRandomNum; i++) {
         buttons.push(
             <Col key={i}>
                 <Button 
@@ -48,6 +48,7 @@ function RandomDialog(props) {
         onSetRandomTime,
         onSetBossRandomTime,
         boss,
+        maxRandomNum,
     } = props
 
     const query = useQuery()
@@ -70,7 +71,7 @@ function RandomDialog(props) {
             size={'tiny'}
         >
             <Dialog.Body>
-                {renderButton(boss ? boss.randomTime : 0, onChoice, onCancel)}
+                {renderButton(boss ? boss.randomTime : 0, onChoice, onCancel, maxRandomNum)}
             </Dialog.Body>
         </Dialog>
     )
@@ -79,6 +80,7 @@ function RandomDialog(props) {
 RandomDialog.propTypes = {
     user: PropTypes.object,
     boss: PropTypes.object,
+    maxRandomNum: PropTypes.number.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSetRandomTime: PropTypes.func.isRequired,
     onSetBossRandomTime: PropTypes.func.isRequired,
@@ -87,6 +89,7 @@ RandomDialog.propTypes = {
 const mapState2Props = state => ({
     user: state.user,
     boss: state.randomBoss,
+    maxRandomNum: state.maxRandomNum,
 })
 
 const mapDispatch2Props = dispatch => ({

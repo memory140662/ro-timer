@@ -1,6 +1,7 @@
 import React from 'react'
 
 import errorNotification from './hoc/errorNotification'
+import loadConfig from './hoc/loadConfig'
 
 import {
   Layout,
@@ -29,4 +30,4 @@ function App() {
   )
 }
 
-export default errorNotification(App)
+export default errorNotification(loadConfig(App))
