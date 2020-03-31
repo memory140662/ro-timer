@@ -19,12 +19,12 @@ function App() {
   return (
     <Router>
       <Switch>
-        <Layout className='layout'>
-          <MainHeader />
-          <Route>
-            <MainContent />
-          </Route>
-        </Layout>
+        <Route>
+          <Layout className='layout'>
+            <MainHeader />
+              <MainContent />
+          </Layout>
+        </Route>  
       </Switch>
     </Router>
   )
