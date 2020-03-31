@@ -369,14 +369,22 @@ function BossTable(props) {
                 scroll={{ y: tableHeight }}
               >
                 <Table.Column title={'名稱'} dataIndex={'name'} key={'name'} width={100} render={column} />
-                <Table.Column align={'center'} title={'死亡時間'} dataIndex={'dealTime'} key={'dealTime'} width={120} render={column}/>
+                <Table.Column align={'center'} title={'死亡時間'} dataIndex={'dealTime'} key={'dealTime'} width={120} render={ dealTime => (
+                  (dealTime && dealTime.length > 5)
+                  ? column(moment(dealTime).format(TIME_FORMAT))
+                  : dealTime
+                )}/>
                 <Table.Column 
                   align={'center'} 
                   title={'重生時間'} 
                   dataIndex={'nextTime'} 
                   key={'nextTime'} 
                   width={120} 
-                  render={column}
+                  render={nextTime => (
+                    (nextTime && nextTime.length > 5)
+                    ? column(moment(nextTime).format(TIME_FORMAT))
+                    : nextTime
+                  )}
                   sortDirections={['ascend']}
                   sorter={(a, b) => {
                     if (!a.nextTime && !b.nextTime) {

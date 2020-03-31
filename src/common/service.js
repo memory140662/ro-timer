@@ -1,10 +1,4 @@
 import moment from 'moment-timezone'
-
-import {
-    TIME_FORMAT,
-    TIME_NUM_FORMAT,
-} from './constants'
-
 class Service {
     static killBoss(inputBoss) {
         if (!inputBoss) {
@@ -12,11 +6,10 @@ class Service {
         }
         const boss = {...inputBoss}
         const currentTime = moment()
-        boss.dealTime = currentTime.format(TIME_FORMAT)
-        boss.dealTimeNum = +currentTime.format(TIME_NUM_FORMAT)
+        boss.dealTime = currentTime.toString()
         boss.nextTime = currentTime
             .add(boss.cd + (boss.randomTime || 0), 'minutes')
-            .format(TIME_FORMAT)
+            .toString()
         return boss
     }
 
@@ -29,9 +22,9 @@ class Service {
 
         boss.randomTime = randomTime
         if (boss.dealTime) {
-            boss.nextTime = moment(boss.dealTime, TIME_FORMAT)
+            boss.nextTime = moment(boss.dealTime)
             .add(boss.cd + boss.randomTime, 'minutes')
-            .format(TIME_FORMAT)
+            .toString()
         }
         return boss
     }
@@ -44,13 +37,13 @@ class Service {
         const boss = {...inputBoss}
 
         boss.cd = newBoss.cd || boss.cd
-        boss.dealTime = newBoss.dealTime
+        boss.dealTime = newBoss.dealTime ? moment(newBoss.dealTime).toString() : null
         boss.nextTime = null
         
         if (boss.dealTime) {
-            boss.nextTime = moment(boss.dealTime, TIME_FORMAT)
+            boss.nextTime = moment(boss.dealTime)
                 .add(+boss.cd + +boss.randomTime, 'minutes')
-                .format(TIME_FORMAT)
+                .toString()
         }
 
         Object.keys(boss).forEach(key => {
@@ -66,7 +59,6 @@ class Service {
         return {
             name: inputBoss.name,
             dealTime: null,
-            dealTimeNum: null,
             nextTime: null,
             randomTime: 0,
             cd: inputBoss.cd || 0,

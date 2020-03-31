@@ -47,7 +47,7 @@ function EditBossDialog(props) {
         e.preventDefault()
         const data = {
             cd: editCdRef.current.value.length ? +editCdRef.current.value : null,
-            dealTime: dealTime && moment(dealTime).format(TIME_FORMAT),
+            dealTime: dealTime,
         }
         if (user) {
             onUpdateBoss(id || user.uid, boss.key, data)
@@ -60,7 +60,7 @@ function EditBossDialog(props) {
     useEffect(() => {
         if (boss) {
             editCdRef.current.value = +boss.cd || null
-            setDealTime(boss.dealTime && moment(boss.dealTime, TIME_FORMAT))
+            setDealTime(boss.dealTime && moment(boss.dealTime, boss.dealTime.length > 5 ? undefined : TIME_FORMAT))
         }
     }, [boss])
 
