@@ -290,12 +290,13 @@ const getMemberHandler = (state, payload, error) => {
     })
 }
 
+const checkMemberStatusPendingHandler = (state) => {
+    return update(state, {
+        isMemberStatusChecking: { $set: true },
+    })
+}
+
 const checkMemberStatusHandler = (state, payload, error) => {
-    if (!payload && !error) {
-        return update(state, {
-            isMemberStatusChecking: { $set: true },
-        })
-    }
     if (error) {
         return update(state, {
             error: { $set: error },
@@ -402,7 +403,7 @@ export default handleActions({
     [asyncPending(types.TYPE_GET_MEMBERS)]: (state) => getMemberHandler(state),
     [asyncPending(types.TYPE_UPDATE_MEMBER_STATUS)]: (state) => updateMemberStatusHandler(state),
     [asyncPending(types.TYPE_REMOVE_MEMBER)]: (state) => removeMemberHandler(state),
-    [asyncPending(types.TYPE_CHECK_MEMBER_STATUS)]: (state) => checkMemberStatusHandler(state),
+    [asyncPending(types.TYPE_CHECK_MEMBER_STATUS)]: (state) => checkMemberStatusPendingHandler(state),
     // fulfilled
     [asyncFulfilled(types.TYPE_GET_ALL_BOSS)]: (state, { payload }) => getAllBossHandler(state, payload),
     [asyncFulfilled(types.TYPE_CREATE_BOSS)]: (state, { payload }) => createBossHandler(state, payload),

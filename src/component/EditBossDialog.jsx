@@ -18,6 +18,8 @@ import {
     updateBoss,
 } from '../common/actions'
 
+import { useLocation } from 'react-router-dom'
+const useQuery = () => (new URLSearchParams(useLocation().search))
 
 const styles = {
     time: {
@@ -38,6 +40,9 @@ function EditBossDialog(props) {
     const editCdRef = useRef()
     const [dealTime, setDealTime] = useState(null)
 
+    const query = useQuery()
+    const id = query.get('id')
+
     const submitHandler = e => {
         e.preventDefault()
         const data = {
@@ -45,7 +50,7 @@ function EditBossDialog(props) {
             dealTime: dealTime && moment(dealTime).format(TIME_FORMAT),
         }
         if (user) {
-            onUpdateBoss(user.uid, boss.key, data)
+            onUpdateBoss(id || user.uid, boss.key, data)
         } else {
             onEditConfirm({...data, key: boss.key})
         }

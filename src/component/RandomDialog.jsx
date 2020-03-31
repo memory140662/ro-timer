@@ -13,6 +13,9 @@ import {
     setRandomBoss,
 } from '../common/actions'
 
+import { useLocation } from 'react-router-dom'
+const useQuery = () => (new URLSearchParams(useLocation().search))
+
 const renderButton = (choiceNum, onChoice, onCancel) => {
     const buttons = []
     for (let i = 0; i <= 20; i++) {
@@ -47,9 +50,12 @@ function RandomDialog(props) {
         boss,
     } = props
 
+    const query = useQuery()
+    const id = query.get('id')
+
     const onChoice = (num) => {
         if (user) {
-          onSetBossRandomTime(user.uid, boss.key, num)
+          onSetBossRandomTime(id || user.uid, boss.key, num)
         } else {
           onSetRandomTime({num, key: boss.key})
         }

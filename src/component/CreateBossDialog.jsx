@@ -13,6 +13,9 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { createBoss, create, setCreateDialogVisible } from '../common/actions'
 
+import { useLocation } from 'react-router-dom'
+const useQuery = () => (new URLSearchParams(useLocation().search))
+
 const styles = {
     form: {
       maxWidth: 400,
@@ -55,6 +58,9 @@ function CreateBossDialog(props) {
         name: null,
     })
 
+    const query = useQuery()
+    const id = query.get('id')
+
     const submitHandler = e => {
         e.preventDefault()
         formRef.current.validate((valid) => {
@@ -64,7 +70,7 @@ function CreateBossDialog(props) {
                     cd: timeRef.current.value.length ? +timeRef.current.value : 0,
                 }
                 if (user) {
-                    onCreateBoss(user.uid, data)
+                    onCreateBoss(id || user.uid, data)
                 } else {
                     onCreate(data)
                 }
