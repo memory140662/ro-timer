@@ -56,9 +56,6 @@ const styles = {
   tableOutside: {
     margin: 10,
   },
-  column: {
-    color: '#000',
-  },
   createButton: {
     float: 'right', 
     margin: '10px',
@@ -332,7 +329,7 @@ function BossTable(props) {
       })
     }
 
-    const column = text => <span style={styles.column}>{text}</span>
+    const column = text => <span>{text}</span>
 
     const isEditable = (!id || (user && user.uid === id)) || memberStatus === MEMBER_STATUS_APPLIED
 
@@ -341,6 +338,9 @@ function BossTable(props) {
           <style>{` 
               .rowColor1 {
                 background: #f5f5f5;
+              }
+              td.ant-table-cell {
+                color: #000;
               }
           `}</style>
           {renderSearchCol({
@@ -369,7 +369,7 @@ function BossTable(props) {
                 scroll={{ y: tableHeight }}
               >
                 <Table.Column title={'名稱'} dataIndex={'name'} key={'name'} width={100} render={column} />
-                <Table.Column align={'center'} title={'死亡時間'} dataIndex={'dealTime'} key={'dealTime'} width={120} render={ dealTime => (
+                <Table.Column align={'center'} title={'死亡時間'} dataIndex={'dealTime'} key={'dealTime'} width={100} render={ dealTime => (
                   (dealTime && dealTime.length > 5)
                   ? column(moment(dealTime).format(TIME_FORMAT))
                   : dealTime
@@ -379,7 +379,7 @@ function BossTable(props) {
                   title={'重生時間'} 
                   dataIndex={'nextTime'} 
                   key={'nextTime'} 
-                  width={120} 
+                  width={100} 
                   render={nextTime => (
                     (nextTime && nextTime.length > 5)
                     ? column(moment(nextTime).format(TIME_FORMAT))
@@ -406,7 +406,7 @@ function BossTable(props) {
                     return 1
                   }}
                 />
-                <Table.Column title={'冷卻時間(分鐘)'} dataIndex={'cd'} key={'cd'} width={150} render={column}/>
+                <Table.Column title={'冷卻時間(分鐘)'} dataIndex={'cd'} key={'cd'} width={130} render={column}/>
                 <Table.Column align={'center'} dataIndex={'randomTime'} key={'randomTime'} width={65} render={(_, data) => (
                   <Button
                     size={'middle'}
