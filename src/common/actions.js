@@ -23,6 +23,8 @@ export const receiveBossRemove = createAction(types.TYPE_RECEIVE_BOSS_REMOVED)
 export const setRandomBoss = createAction(types.TYPE_SET_RANDOM_BOSS)
 export const setMemberStatus = createAction(types.TYPE_SET_MEMBER_STATUS)
 export const receiveMemberApply = createAction(types.TYPE_RECEIVE_MEMBER_APPLY)
+export const setNextTimeBoss = createAction(types.TYPE_SET_NEXT_TIME_BOSS)
+export const setNextTime = createAction(types.TYPE_SET_NEXT_TIME)
 
 // async
 export const deleteBoss = createAction(types.TYPE_DELETE_BOSS, Api.deleteBoss)
@@ -40,3 +42,4 @@ export const checkMemberStatus = createAction(types.TYPE_CHECK_MEMBER_STATUS, Ap
 export const updateMemberStatus = createAction(types.TYPE_UPDATE_MEMBER_STATUS, Api.updateMemberStatus)
 export const removeMember = createAction(types.TYPE_REMOVE_MEMBER, Api.removeMember)
 export const loadRemoteConfig = createAction(types.TYPE_LOAD_REMOTE_CONFIG, Api.loadRemoteConfig)
+export const setBossNextTime = createAction(types.TYPE_SET_BOSS_NEXT_TIME, Api.setNextTime)

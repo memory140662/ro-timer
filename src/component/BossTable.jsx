@@ -41,6 +41,7 @@ import {
   setMemberStatus,
   update,
   updateBoss,
+  setNextTimeBoss,
 } from '../common/actions'
 import { TIME_FORMAT, MEMBER_STATUS_PENDING, MEMBER_STATUS_APPLIED } from '../common/constants'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
@@ -138,6 +139,7 @@ function BossTable(props) {
       onOpenRandomDialog,
       onSetMemberStatus,
       onClear,
+      onSetNextTimeBoss,
 
       onDeleteBoss, 
       onKillBoss, 
@@ -406,7 +408,7 @@ function BossTable(props) {
                     return 1
                   }}
                 />
-                <Table.Column title={'冷卻時間'} align={'center'} dataIndex={'cd'} key={'cd'} width={80} render={column}/>
+                <Table.Column title={'CD'} align={'center'} dataIndex={'cd'} key={'cd'} width={60} render={column}/>
                 <Table.Column title={'亂數'} align={'center'} dataIndex={'randomTime'} key={'randomTime'} width={65} render={(_, data) => (
                   <Button
                     size={'middle'}
@@ -417,13 +419,14 @@ function BossTable(props) {
                     style={isEditable ? styles.randomButton : styles.randomButtonDisable}
                   >{data.randomTime || 0}</Button>
                 )}/>
-                <Table.Column title={'操作'} dataIndex={'opt'} key={'opt'} render={(_, data) => (
+                <Table.Column title={'操作'} dataIndex={'opt'} key={'opt'} width={490} render={(_, data) => (
                   isEditable ? 
                   <>
                     <EButton icon={'check'} type={'success'} onClick={() => killHandler(user && (id || user.uid), data.key)}>擊殺</EButton>
                     <EButton icon={'edit'} type={'info'} onClick={() => onEdit(data.key)}>編輯</EButton>
                     <EButton icon={'delete'} type={'danger'} onClick={() => deleteHandler(user && (id || user.uid), data)}>刪除</EButton>
                     <EButton icon={'close'} onClick={() => clearHandler(user && (id || user.uid), data)}>清除</EButton>
+                    <EButton icon={'caret-right'} type={'warning'} onClick={() => onSetNextTimeBoss(data.key)}>重生時間</EButton>
                   </>
                   : null
                 )}/>
@@ -454,6 +457,7 @@ BossTable.propTypes = {
     onOpenRandomDialog: PropTypes.func.isRequired,
     onSetMemberStatus: PropTypes.func.isRequired,
     onClear: PropTypes.func.isRequired,
+    onSetNextTimeBoss: PropTypes.func.isRequired,
     
     onDeleteBoss: PropTypes.func.isRequired,
     onKillBoss: PropTypes.func.isRequired,
@@ -488,6 +492,7 @@ const mapDispatch2Props = dispatch => ({
     onOpenRandomDialog: boss => dispatch(setRandomBoss(boss)),
     onSetMemberStatus: status => dispatch(setMemberStatus(status)),
     onClear: key => dispatch(update({key, dealTime: null })),
+    onSetNextTimeBoss: key => dispatch(setNextTimeBoss(key)),
     
     onDeleteBoss: (userId, bossKey)=> dispatch(deleteBoss(userId, bossKey)),
     onKillBoss: (userId, bossKey) => dispatch(killBoss(userId, bossKey)),

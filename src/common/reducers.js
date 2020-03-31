@@ -14,6 +14,7 @@ const initState = {
     data: [],
     currentBoss: null,
     randomBoss: null,
+    nextTimeBoss: null,
     user: null,
     isLoading: false,
     localData: null,
@@ -383,6 +384,36 @@ const loadRemoteConfigHandler = (state, payload) => {
     }
 }
 
+const setNextTimeBossHandler = (state, payload) => {
+    if (!payload) {
+        return update(state, {
+            nextTimeBoss: { $set: null },
+        })
+    }
+
+    const index = state.data.findIndex(boss => boss.key === payload)
+    if (index === -1) {
+        return state
+    }
+    const boss = state.data[index]
+    return update(state, {
+        nextTimeBoss: { $set: boss },
+    })
+}
+
+const setNextTimeHandler = (state, payload) => {
+    const index = state.data.findIndex(boss => boss.key === payload.key)
+    if (index === -1) {
+        return state
+    }
+    const boss = state.data[index]
+    const newBoss = Service.setNextTime(boss, payload.afterMinutes)
+    return update(state, {
+        data: { $splice: [[index, 1, newBoss]] },
+        nextTimeBoss: { $set: null },
+    })
+}
+
 export default handleActions({
     [types.TYPE_CREATE]: (state, { payload }) => createHandler(state, payload),
     [types.TYPE_LOAD_DATA]: (state) => loadHandler(state),
@@ -405,6 +436,8 @@ export default handleActions({
     [types.TYPE_SET_CREATE_DIALOG_VISIBLE]: (state, { payload }) => setCreateDialogVisibleHandler(state, payload),
     [types.TYPE_SET_MEMBER_STATUS]: (state, { payload }) => setMemberStatusHandler(state, payload),
     [types.TYPE_RECEIVE_MEMBER_APPLY]: (state, { payload }) => receiveMemberApplyHandler(state, payload),
+    [types.TYPE_SET_NEXT_TIME_BOSS]: (state, { payload }) => setNextTimeBossHandler(state, payload),
+    [types.TYPE_SET_NEXT_TIME]: (state, { payload }) => setNextTimeHandler(state, payload),
     // pending
     [asyncPending(types.TYPE_SIGN_IN_USER)]: (state) => pendingHandler(state),
     [asyncPending(types.TYPE_SIGN_OUT_USER)]: (state) => pendingHandler(state),
@@ -421,6 +454,7 @@ export default handleActions({
     [asyncPending(types.TYPE_REMOVE_MEMBER)]: (state) => removeMemberHandler(state),
     [asyncPending(types.TYPE_CHECK_MEMBER_STATUS)]: (state) => checkMemberStatusPendingHandler(state),
     [asyncPending(types.TYPE_LOAD_REMOTE_CONFIG)]: (state) => loadRemoteConfigPendingHandler(state),
+    [asyncPending(types.TYPE_SET_BOSS_NEXT_TIME)]: (state) => pendingHandler(state),
     // fulfilled
     [asyncFulfilled(types.TYPE_GET_ALL_BOSS)]: (state, { payload }) => getAllBossHandler(state, payload),
     [asyncFulfilled(types.TYPE_CREATE_BOSS)]: (state, { payload }) => createBossHandler(state, payload),
@@ -435,6 +469,7 @@ export default handleActions({
     [asyncFulfilled(types.TYPE_UPDATE_MEMBER_STATUS)]: (state, { payload }) => updateMemberStatusHandler(state, payload),
     [asyncFulfilled(types.TYPE_REMOVE_MEMBER)]: (state, { payload }) => removeMemberHandler(state, payload),
     [asyncFulfilled(types.TYPE_LOAD_REMOTE_CONFIG)]: (state, { payload }) => loadRemoteConfigHandler(state, payload),
+    [asyncFulfilled(types.TYPE_SET_BOSS_NEXT_TIME)]: (state, { payload }) => updateBossHandler(state, payload),
     // rejected
     [asyncRejected(types.TYPE_GET_ALL_BOSS)]: (state, { payload }) => rejectedHandler(state, payload),
     [asyncRejected(types.TYPE_CREATE_BOSS)]: (state, { payload }) => rejectedHandler(state, payload),
@@ -448,4 +483,5 @@ export default handleActions({
     [asyncRejected(types.TYPE_CHECK_MEMBER_STATUS)]: (state, { payload }) => checkMemberStatusHandler(state, null, payload),
     [asyncRejected(types.TYPE_UPDATE_MEMBER_STATUS)]: (state, { payload }) => updateMemberStatusHandler(state, null, payload),
     [asyncRejected(types.TYPE_REMOVE_MEMBER)]: (state, { payload }) => removeMemberHandler(state, null, payload),
+    [asyncRejected(types.TYPE_SET_BOSS_NEXT_TIME)]: (state, { payload }) => rejectedHandler(state, payload),
 }, initState)

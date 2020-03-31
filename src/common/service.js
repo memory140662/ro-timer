@@ -1,5 +1,18 @@
 import moment from 'moment-timezone'
 class Service {
+    
+    static setNextTime(inputBoss, afterMinutes = 0) {
+        if (!inputBoss) {
+            throw new Error('not found')
+        }
+        const boss = {...inputBoss}
+        const currentTime = moment()
+        boss.nextTime = currentTime.add(afterMinutes, 'minutes').toString()
+        boss.dealTime = moment(boss.nextTime).add(-(boss.cd || 0), 'minutes').toString()
+        boss.randomTime = 0
+        return boss
+    }
+
     static killBoss(inputBoss) {
         if (!inputBoss) {
             throw new Error('not found')

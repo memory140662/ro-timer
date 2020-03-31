@@ -18,6 +18,7 @@ const CreateBossDialog = asyncComponent(import('./CreateBossDialog'))
 const Local2CloudDialog = asyncComponent(import('./Local2CloudDialog'))
 const EditBossDialog = asyncComponent(import('./EditBossDialog'))
 const RandomDialog = asyncComponent(import('./RandomDialog'))
+const NextTimeDialog = asyncComponent(import('./NextTimeDialog'))
 
 const styles = {
     content: {
@@ -39,6 +40,7 @@ const MainContent = (props) => {
                 <Local2CloudDialog />
                 <EditBossDialog /> 
                 <RandomDialog /> 
+                <NextTimeDialog /> 
             </Content>
         </Spin>
     )

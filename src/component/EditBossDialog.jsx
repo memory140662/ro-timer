@@ -19,6 +19,7 @@ import {
 } from '../common/actions'
 
 import { useLocation } from 'react-router-dom'
+import NumberInput from './NumberInput'
 const useQuery = () => (new URLSearchParams(useLocation().search))
 
 const styles = {
@@ -88,16 +89,11 @@ function EditBossDialog(props) {
                         />
                     </Form.Item>
                     <Form.Item label={'冷卻時間(分鐘)'} style={styles.time} labelWidth={'120'}>
-                        <div className='el-input-number'>
-                            <input
-                                style={styles.input}
-                                ref={editCdRef}
-                                className='form-control' 
-                                type={'number'}
-                                min={0}
-                                max={60 * 24}
-                            />
-                        </div>
+                        <NumberInput
+                            style={styles.input}
+                            ref={editCdRef}
+                            min={0}
+                            max={60 * 24}/>
                     </Form.Item>
                     
                 </Dialog.Body>
