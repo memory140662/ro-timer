@@ -406,8 +406,8 @@ function BossTable(props) {
                     return 1
                   }}
                 />
-                <Table.Column title={'冷卻時間(分鐘)'} dataIndex={'cd'} key={'cd'} width={130} render={column}/>
-                <Table.Column align={'center'} dataIndex={'randomTime'} key={'randomTime'} width={65} render={(_, data) => (
+                <Table.Column title={'冷卻時間'} align={'center'} dataIndex={'cd'} key={'cd'} width={80} render={column}/>
+                <Table.Column title={'亂數'} align={'center'} dataIndex={'randomTime'} key={'randomTime'} width={65} render={(_, data) => (
                   <Button
                     size={'middle'}
                     shape={'circle'} 
@@ -417,13 +417,13 @@ function BossTable(props) {
                     style={isEditable ? styles.randomButton : styles.randomButtonDisable}
                   >{data.randomTime || 0}</Button>
                 )}/>
-                <Table.Column title={'操作'} dataIndex={'opt'} key={'opt'} width={320} render={(_, data) => (
+                <Table.Column title={'操作'} dataIndex={'opt'} key={'opt'} render={(_, data) => (
                   isEditable ? 
                   <>
-                    <EButton size={'small'} icon={'check'} type={'success'} onClick={() => killHandler(user && (id || user.uid), data.key)}>擊殺</EButton>
-                    <EButton size={'small'} icon={'edit'} type={'info'} onClick={() => onEdit(data.key)}>編輯</EButton>
-                    <EButton size={'small'} icon={'delete'} type={'danger'} onClick={() => deleteHandler(user && (id || user.uid), data)}>刪除</EButton>
-                    <EButton size={'small'} icon={'close'} onClick={() => clearHandler(user && (id || user.uid), data)}>清除</EButton>
+                    <EButton icon={'check'} type={'success'} onClick={() => killHandler(user && (id || user.uid), data.key)}>擊殺</EButton>
+                    <EButton icon={'edit'} type={'info'} onClick={() => onEdit(data.key)}>編輯</EButton>
+                    <EButton icon={'delete'} type={'danger'} onClick={() => deleteHandler(user && (id || user.uid), data)}>刪除</EButton>
+                    <EButton icon={'close'} onClick={() => clearHandler(user && (id || user.uid), data)}>清除</EButton>
                   </>
                   : null
                 )}/>
