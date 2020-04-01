@@ -424,11 +424,12 @@ function BossTable(props) {
                 <Table.Column title={'操作'} dataIndex={'opt'} key={'opt'} width={490} render={(_, data) => (
                   isEditable ? 
                   <>
-                    <EButton icon={'check'} type={'success'} onClick={() => killHandler(user && (id || user.uid), data.key)}>擊殺</EButton>
-                    <EButton icon={'edit'} type={'info'} onClick={() => onEdit(data.key)}>編輯</EButton>
-                    <EButton icon={'delete'} type={'danger'} onClick={() => deleteHandler(user && (id || user.uid), data)}>刪除</EButton>
-                    <EButton icon={'close'} onClick={() => clearHandler(user && (id || user.uid), data)}>清除</EButton>
-                    <EButton icon={'caret-right'} type={'warning'} onClick={() => onSetNextTimeBoss(data.key)}>重生時間</EButton>
+                    <EButton size={'small'} icon={'check'} type={'success'} onClick={() => killHandler(user && (id || user.uid), data.key)}>擊殺</EButton>
+                    <EButton size={'small'} icon={'time'} type={'success'} onClick={() => killHandler(user && (id || user.uid), data.key) & onOpenRandomDialog(data)}>雷達擊殺</EButton>
+                    <EButton size={'small'} icon={'edit'} type={'info'} onClick={() => onEdit(data.key)}>編輯</EButton>
+                    <EButton size={'small'} icon={'delete'} type={'danger'} onClick={() => deleteHandler(user && (id || user.uid), data)}>刪除</EButton>
+                    <EButton size={'small'} icon={'close'} onClick={() => clearHandler(user && (id || user.uid), data)}>清除</EButton>
+                    <EButton size={'small'} icon={'caret-right'} type={'warning'} onClick={() => onSetNextTimeBoss(data.key)}>重生時間</EButton>
                   </>
                   : null
                 )}/>
