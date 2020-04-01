@@ -403,7 +403,8 @@ function BossTable(props) {
                       return 1
                     }
                     
-                    if (moment(a.nextTime, TIME_FORMAT).isBefore(moment(b.nextTime, TIME_FORMAT))) {
+                    if (moment(a.nextTime.length > 5 ? new Date(a.nextTime) : a.nextTime, a.nextTime.length > 5 ? undefined : TIME_FORMAT)
+                        .isBefore(moment(b.nextTime.length > 5 ? new Date(b.nextTime) : b.nextTime, b.nextTime.length > 5 ? undefined : TIME_FORMAT))) {
                       return -1
                     }
 
