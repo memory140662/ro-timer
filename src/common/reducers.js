@@ -29,6 +29,7 @@ const initState = {
     isMemberStatusChecking: false,
     maxRandomNum: 0,
     isConfigLoading: false,
+    isRadarKill: false,
 }
 
 const createHandler = (state, payload) => {
@@ -149,13 +150,13 @@ const updateHandler = (state, payload) => {
     })
 }
 
-const killHandler = (state, key) => {
-    const index = state.data.findIndex(boss => boss.key === key)
+const killHandler = (state, payload) => {
+    const index = state.data.findIndex(boss => boss.key === payload.key)
     if (index === -1) {
         return state
     }
     const boss = state.data[index]
-    const newBoss = Service.killBoss(boss)
+    const newBoss = Service.killBoss(boss, payload.randomTime)
     return update(state, {
         data: { $splice: [[index, 1, newBoss]] },
     })
@@ -243,7 +244,8 @@ const receiveBossRemovedHandler = (state, payload) => {
 const setRandomBossHandler = (state, payload) => {
 
     return update(state, {
-        randomBoss: { $set: payload },
+        randomBoss: { $set: payload.boss },
+        isRadarKill: { $set: payload.isRadarKill || false },
     })
 }
 

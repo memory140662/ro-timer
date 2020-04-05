@@ -72,12 +72,12 @@ export const updateBoss = async (userId, bossKey, payload) => {
     return newBoss
 }
 
-export const killBoss = async (userId, bossKey) => {
+export const killBoss = async (userId, bossKey, randomTime) => {
     const path = `/users/${userId}/bosses/${bossKey}`
     const snapshot = await database.ref(path).once('value')
     const boss = snapshot.val()
     
-    const newBoss = Service.killBoss(boss)
+    const newBoss = Service.killBoss(boss, randomTime)
 
     await database.ref(path).update(newBoss)
     return newBoss

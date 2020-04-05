@@ -13,15 +13,16 @@ class Service {
         return boss
     }
 
-    static killBoss(inputBoss) {
+    static killBoss(inputBoss, randomTime = 0) {
         if (!inputBoss) {
             throw new Error('not found')
         }
         const boss = {...inputBoss}
         const currentTime = moment()
         boss.dealTime = currentTime.toString()
+        boss.randomTime = randomTime
         boss.nextTime = currentTime
-            .add(boss.cd + (boss.randomTime || 0), 'minutes')
+            .add(boss.cd + boss.randomTime, 'minutes')
             .toString()
         return boss
     }

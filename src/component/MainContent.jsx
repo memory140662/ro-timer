@@ -33,7 +33,7 @@ const MainContent = (props) => {
         <Spin size={'large'} spinning={isConfigLoading}>
             <Content style={styles.content}>
                 <Row gutter={16}>
-                    <Col xs={24} sm={24} md={24} lg={20} xl={16} xxl={16}><BossTable /></Col>
+                    <Col xs={24} sm={24} md={24} lg={24} xl={16} xxl={16}><BossTable /></Col>
                     <Col xs={0} sm={0} md={0} lg={0} xl={8} xxl={4}><MemberTable/></Col>
                 </Row>
                 <CreateBossDialog />

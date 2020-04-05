@@ -292,7 +292,7 @@ function BossTable(props) {
       if (uid) {
         onKillBoss(uid, bossKey)
       } else {
-        onKill(bossKey)
+        onKill({ key: bossKey })
       }
     }
 
@@ -426,7 +426,7 @@ function BossTable(props) {
                   isEditable ? 
                   <>
                     <EButton size={'small'} icon={'check'} type={'success'} onClick={() => killHandler(user && (id || user.uid), data.key)}>擊殺</EButton>
-                    <EButton size={'small'} icon={'time'} type={'success'} onClick={() => killHandler(user && (id || user.uid), data.key) & onOpenRandomDialog(data)}>雷達擊殺</EButton>
+                    <EButton size={'small'} icon={'time'} type={'success'} onClick={() => onOpenRandomDialog(data, true)}>雷達擊殺</EButton>
                     <EButton size={'small'} icon={'edit'} type={'info'} onClick={() => onEdit(data.key)}>編輯</EButton>
                     <EButton size={'small'} icon={'delete'} type={'danger'} onClick={() => deleteHandler(user && (id || user.uid), data)}>刪除</EButton>
                     <EButton size={'small'} icon={'close'} onClick={() => clearHandler(user && (id || user.uid), data)}>清除</EButton>
@@ -493,7 +493,7 @@ const mapDispatch2Props = dispatch => ({
     onReceiveBossChanged: boss => dispatch(receiveBossChanged(boss)),
     onReceiveBossAdded: boss => dispatch(receiveBossAdded(boss)),
     onReceiveBossRemoved: boss => dispatch(receiveBossRemove(boss)),
-    onOpenRandomDialog: boss => dispatch(setRandomBoss(boss)),
+    onOpenRandomDialog: (boss, isRadarKill) => dispatch(setRandomBoss({ boss, isRadarKill })),
     onSetMemberStatus: status => dispatch(setMemberStatus(status)),
     onClear: key => dispatch(update({key, dealTime: null })),
     onSetNextTimeBoss: key => dispatch(setNextTimeBoss(key)),

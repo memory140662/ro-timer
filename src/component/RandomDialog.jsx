@@ -11,6 +11,8 @@ import {
     setRandomTime,
     setBossRandomTime,
     setRandomBoss,
+    kill,
+    killBoss,
 } from '../common/actions'
 
 import { useLocation } from 'react-router-dom'
@@ -49,6 +51,9 @@ function RandomDialog(props) {
         onSetBossRandomTime,
         boss,
         maxRandomNum,
+        isRadarKill,
+        onKill,
+        onKillBoss,
     } = props
 
     const query = useQuery()
@@ -56,9 +61,17 @@ function RandomDialog(props) {
 
     const onChoice = (num) => {
         if (user) {
-          onSetBossRandomTime(id || user.uid, boss.key, num)
+            if (isRadarKill) {
+                onKillBoss(id || user.uid, boss.key, num)
+            } else {
+                onSetBossRandomTime(id || user.uid, boss.key, num)
+            }
         } else {
-          onSetRandomTime({num, key: boss.key})
+            if (isRadarKill) {
+                onKill(boss.key, num)
+            } else {
+                onSetRandomTime(boss.key, num)
+            }
         }
         onCancel()
     }
@@ -84,18 +97,22 @@ RandomDialog.propTypes = {
     onCancel: PropTypes.func.isRequired,
     onSetRandomTime: PropTypes.func.isRequired,
     onSetBossRandomTime: PropTypes.func.isRequired,
+    isRadarKill: PropTypes.bool.isRequired,
 }
 
 const mapState2Props = state => ({
     user: state.user,
     boss: state.randomBoss,
     maxRandomNum: state.maxRandomNum,
+    isRadarKill: state.isRadarKill,
 })
 
 const mapDispatch2Props = dispatch => ({
-    onCancel: () => dispatch(setRandomBoss(null)),
-    onSetRandomTime: data => dispatch(setRandomTime(data)),
+    onCancel: () => dispatch(setRandomBoss({})),
+    onSetRandomTime: (bossKey, randomTime) => dispatch(setRandomTime({ key: bossKey, num: randomTime })),
     onSetBossRandomTime: (userId, bossKey, randomTime) => dispatch(setBossRandomTime(userId, bossKey, randomTime)),
+    onKill: (bossKey, randomTime) => dispatch(kill({key: bossKey, randomTime})),
+    onKillBoss: (userId, bossKey, randomTime) => dispatch(killBoss(userId, bossKey, randomTime)),
 })
 
 export default connect(mapState2Props, mapDispatch2Props)(RandomDialog)
