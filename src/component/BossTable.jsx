@@ -12,13 +12,14 @@ import {
 
 import { useLocation } from 'react-router-dom'
 
-import { Table, Button, message, Modal } from 'antd'
+import { Table, Button, message, Modal, Tooltip } from 'antd'
 import { DndProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 import { database } from '../common/api'
 
 import PropTypes from 'prop-types'
 import moment from 'moment-timezone'
+import { QuestionCircleOutlined } from '@ant-design/icons'
 
 import { 
   load,
@@ -73,6 +74,10 @@ const styles = {
   },
   deleteDialog: { 
     color: 'red',
+  },
+  cellRadarIcon: {
+    marginTop: '-3px',
+    verticalAlign: 'middle',
   },
 }
 
@@ -412,17 +417,32 @@ function BossTable(props) {
                   }}
                 />
                 <Table.Column title={'CD'} align={'center'} dataIndex={'cd'} key={'cd'} width={60} render={column}/>
-                <Table.Column title={'亂數'} align={'center'} dataIndex={'randomTime'} key={'randomTime'} width={65} render={(_, data) => (
-                  <Button
-                    size={'middle'}
-                    shape={'circle'} 
-                    disabled={!isEditable}
-                    type={isEditable ? null : 'link'}
-                    onClick={() => onOpenRandomDialog(data)} 
-                    style={isEditable ? styles.randomButton : styles.randomButtonDisable}
-                  >{data.randomTime || 0}</Button>
-                )}/>
-                <Table.Column title={'操作'} dataIndex={'opt'} key={'opt'} width={490} render={(_, data) => (
+                <Table.Column 
+                  title={() => (
+                        <span>
+                          {'雷達'}
+                          <Tooltip title={'如果有使用雷達，按鈕邊框顯示為藍色。'}>
+                            <QuestionCircleOutlined style={styles.cellRadarIcon}/>
+                          </Tooltip>
+                        </span>
+                    )} 
+                  align={'center'} 
+                  dataIndex={'randomTime'} 
+                  key={'randomTime'} 
+                  width={70} 
+                  render={(_, data) => (
+                      <Button
+                        size={'middle'}
+                        shape={'circle'} 
+                        disabled={!isEditable}
+                        ghost={!!data.isRadarUsed}
+                        type={isEditable ? (!!data.isRadarUsed ? 'primary': null) : 'link'}
+                        onClick={() => onOpenRandomDialog(data)} 
+                        style={isEditable ? styles.randomButton : styles.randomButtonDisable}
+                      >{data.randomTime || 0}</Button>
+                    )}
+                  />
+                <Table.Column title={'操作'} dataIndex={'opt'} key={'opt'} width={488} render={(_, data) => (
                   isEditable ? 
                   <>
                     <EButton size={'small'} icon={'check'} type={'success'} onClick={() => killHandler(user && (id || user.uid), data.key)}>擊殺</EButton>
@@ -495,7 +515,7 @@ const mapDispatch2Props = dispatch => ({
     onReceiveBossRemoved: boss => dispatch(receiveBossRemove(boss)),
     onOpenRandomDialog: (boss, isRadarKill) => dispatch(setRandomBoss({ boss, isRadarKill })),
     onSetMemberStatus: status => dispatch(setMemberStatus(status)),
-    onClear: key => dispatch(update({key, dealTime: null })),
+    onClear: key => dispatch(update({key, dealTime: null, isRadarUsed: false })),
     onSetNextTimeBoss: key => dispatch(setNextTimeBoss(key)),
     
     onDeleteBoss: (userId, bossKey)=> dispatch(deleteBoss(userId, bossKey)),
@@ -503,7 +523,7 @@ const mapDispatch2Props = dispatch => ({
     onGetAllBoss: (userId) => dispatch(getAllBoss(userId)),
     onApplyMember: (userId, applyUser) => dispatch(applyMember(userId, applyUser)),
     onCheckMemberStatus: (userId, applyUserId) => dispatch(checkMemberStatus(userId, applyUserId)),
-    onClearBoss: (userId, bossKey) => dispatch(updateBoss(userId, bossKey, { dealTime: null })),
+    onClearBoss: (userId, bossKey) => dispatch(updateBoss(userId, bossKey, { dealTime: null, isRadarUsed: false })),
 })
 
 export default connect(mapState2Props, mapDispatch2Props)(BossTable)

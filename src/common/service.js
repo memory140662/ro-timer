@@ -1,7 +1,7 @@
 import moment from 'moment-timezone'
 class Service {
     
-    static setNextTime(inputBoss, afterMinutes = 0) {
+    static setNextTime(inputBoss, afterMinutes = 0, isRadarUsed = false) {
         if (!inputBoss) {
             throw new Error('not found')
         }
@@ -10,17 +10,19 @@ class Service {
         boss.nextTime = currentTime.add(afterMinutes, 'minutes').toString()
         boss.dealTime = moment(boss.nextTime).add(-(boss.cd || 0), 'minutes').toString()
         boss.randomTime = 0
+        boss.isRadarUsed = isRadarUsed
         return boss
     }
 
-    static killBoss(inputBoss, randomTime = 0) {
+    static killBoss(inputBoss, randomTime) {
         if (!inputBoss) {
             throw new Error('not found')
         }
         const boss = {...inputBoss}
         const currentTime = moment()
         boss.dealTime = currentTime.toString()
-        boss.randomTime = randomTime
+        boss.isRadarUsed = (randomTime === undefined) ? false : true
+        boss.randomTime = randomTime || 0
         boss.nextTime = currentTime
             .add(boss.cd + boss.randomTime, 'minutes')
             .toString()
@@ -33,7 +35,7 @@ class Service {
         }
 
         const boss = {...inputBoss}
-
+        boss.isRadarUsed = true
         boss.randomTime = randomTime
         if (boss.dealTime) {
             boss.nextTime = moment(boss.dealTime)
@@ -58,6 +60,10 @@ class Service {
             boss.nextTime = moment(boss.dealTime)
                 .add(+boss.cd + +boss.randomTime, 'minutes')
                 .toString()
+        }
+
+        if (newBoss.isRadarUsed !== undefined) {
+            boss.isRadarUsed = newBoss.isRadarUsed
         }
 
         Object.keys(boss).forEach(key => {

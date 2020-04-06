@@ -409,7 +409,7 @@ const setNextTimeHandler = (state, payload) => {
         return state
     }
     const boss = state.data[index]
-    const newBoss = Service.setNextTime(boss, payload.afterMinutes)
+    const newBoss = Service.setNextTime(boss, payload.afterMinutes, payload.isRadarUsed)
     return update(state, {
         data: { $splice: [[index, 1, newBoss]] },
         nextTimeBoss: { $set: null },

@@ -191,12 +191,12 @@ export const loadRemoteConfig = async () => {
     }
 }
 
-export const setNextTime = async (userId, bossKey, afterMinutes) => {
+export const setNextTime = async (userId, bossKey, afterMinutes, isRadarUsed) => {
     const path = `/users/${userId}/bosses/${bossKey}`
     const snapshot = await database.ref(path).once('value')
     const boss = snapshot.val()
     
-    const newBoss = Service.setNextTime(boss, afterMinutes)
+    const newBoss = Service.setNextTime(boss, afterMinutes, isRadarUsed)
 
     await database.ref(path).update(newBoss)
 

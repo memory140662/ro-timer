@@ -12,6 +12,7 @@ import {
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { createBoss, create, setCreateDialogVisible } from '../common/actions'
+import NumberInput  from './NumberInput'
 
 import { useLocation } from 'react-router-dom'
 const useQuery = () => (new URLSearchParams(useLocation().search))
@@ -112,16 +113,12 @@ function CreateBossDialog(props) {
                         />
                     </Form.Item>
                     <Form.Item label={'冷卻時間(分鐘)'} style={styles.time} prop={'time'}>
-                        <div className='el-input-number'>
-                            <input
-                                style={styles.input}
-                                ref={timeRef}
-                                className='form-control' 
-                                type={'number'}
-                                min={0}
-                                max={60 * 24}
-                            />
-                        </div>
+                        <NumberInput 
+                            style={styles.input}
+                            ref={timeRef}
+                            min={0}
+                            max={60 * 24}
+                        />
                     </Form.Item>
                 </Dialog.Body>
                 <Dialog.Footer className={'dialog-footer'}>
