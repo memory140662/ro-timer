@@ -435,7 +435,7 @@ function BossTable(props) {
                         size={'middle'}
                         shape={'circle'} 
                         disabled={!isEditable}
-                        ghost={!!data.isRadarUsed}
+                        ghost={isEditable && !!data.isRadarUsed}
                         type={isEditable ? (!!data.isRadarUsed ? 'primary': null) : 'link'}
                         onClick={() => onOpenRandomDialog(data)} 
                         style={isEditable ? styles.randomButton : styles.randomButtonDisable}
