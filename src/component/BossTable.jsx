@@ -421,9 +421,13 @@ function BossTable(props) {
                   title={() => (
                         <span>
                           {'雷達'}
-                          <Tooltip title={'如果有使用雷達，按鈕邊框顯示為藍色。'}>
-                            <QuestionCircleOutlined style={styles.cellRadarIcon}/>
-                          </Tooltip>
+                          {
+                            isEditable 
+                            ? <Tooltip title={'如果有使用雷達，按鈕邊框顯示為藍色。'}>
+                                <QuestionCircleOutlined style={styles.cellRadarIcon}/>
+                              </Tooltip>
+                            : null   
+                          }
                         </span>
                     )} 
                   align={'center'} 
